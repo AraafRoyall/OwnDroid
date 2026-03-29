@@ -16,7 +16,7 @@ class CrossProfileIntentFilterRepository(val dbHelper: MyDbHelper) {
     fun getAllCrossProfileIntentFilters(): List<IntentFilterOptions> {
         val list = mutableListOf<IntentFilterOptions>()
         dbHelper.readableDatabase.rawQuery(
-            "SELECT * FROM cross_profile_intent_filters", null
+            "SELECT * FROM cross_profile_intent_filters ORDER BY time DESC", null
         ).use {
             while (it.moveToNext()) {
                 list += IntentFilterOptions(

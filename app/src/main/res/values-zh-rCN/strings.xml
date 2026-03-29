@@ -338,6 +338,7 @@
     <string name="profile_max_time_out_desc">工作资料处于关闭状态的时间达到该限制后会挂起个人应用，0为无限制</string>
     <string name="personal_app_suspended_because_timeout">个人应用已经因此挂起：%1$s</string>
     <string name="intent_filter">Intent过滤器</string>
+    <string name="history">历史</string>
     <string name="presets">预设</string>
     <string name="open_file">打开文件</string>
     <string name="share">分享</string>
@@ -679,7 +680,7 @@
     <string name="info_evict_credential_encryption_key">从密钥环中移除用户的凭证加密密钥。用户需要再次输入凭证才能将密钥存储回密钥环中。为了保护用户数据，用户将重新启动</string>
     <string name="info_reboot">打电话时不能使用此功能</string>
     <string name="info_content_protection_policy">内容保护策略控制对欺骗性应用程序的扫描。</string>
-    <string name="info_permission_policy">设置应用申请运行时权限时的默认选择</string>
+    <string name="info_permission_policy">设置应用申请运行时权限时的默认选择。只有OwnDroid能修改被此策略允许或拒绝的权限。</string>
     <string name="info_mte_policy">设置内存标记扩展(Memory Tagging Extension)策略。重启设备以应用更改。</string>
     <string name="info_nearby_app_streaming_policy">应用流式传输：当app在虚拟显示器上启动，传输这个app的视频流到附近的设备。</string>
     <string name="info_nearby_notification_streaming_policy">通知流式传输：预安装的应用把通知数据传输到附近的设备。</string>

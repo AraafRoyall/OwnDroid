@@ -54,4 +54,8 @@ class CrossProfileIntentFilterViewModel(
         }
         toastChannel.sendStatus(true)
     }
+
+    fun getHistory(): List<IntentFilterOptions> {
+        return repo.getAllCrossProfileIntentFilters()
+    }
 }

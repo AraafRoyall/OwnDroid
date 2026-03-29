@@ -95,6 +95,7 @@ import com.bintianqi.owndroid.feature.users.UserSessionMessageScreen
 import com.bintianqi.owndroid.feature.users.UsersOptionsScreen
 import com.bintianqi.owndroid.feature.users.UsersScreen
 import com.bintianqi.owndroid.feature.work_profile.CreateWorkProfileScreen
+import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterHistoryScreen
 import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterPresetsScreen
 import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterScreen
 import com.bintianqi.owndroid.feature.work_profile.DeleteWorkProfileScreen
@@ -360,15 +361,18 @@ fun myEntryProvider(
     }
     entry<Destination.CrossProfileIntentFilter> {
         CrossProfileIntentFilterScreen(
-            viewModel(factory = container.viewModelFactory), ::navigateUp
-        ) {
-            navigate(Destination.CrossProfileIntentFilterPresets)
-        }
+            viewModel(factory = container.viewModelFactory), ::navigateUp, ::navigate
+        )
     }
     entry<Destination.CrossProfileIntentFilterPresets>(
         metadata = navParentKey<Destination.CrossProfileIntentFilter>()
     ) {
         CrossProfileIntentFilterPresetsScreen(viewModel(), ::navigateUp)
+    }
+    entry<Destination.CrossProfileIntentFilterHistory>(
+        metadata = navParentKey<Destination.CrossProfileIntentFilter>()
+    ) {
+        CrossProfileIntentFilterHistoryScreen(viewModel(), ::navigateUp)
     }
     entry<Destination.DeleteWorkProfile>(
         metadata = navParentKey<Destination.WorkProfile>()

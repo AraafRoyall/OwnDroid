@@ -23,10 +23,10 @@ import com.bintianqi.owndroid.utils.showOperationResultToast
 import kotlin.system.exitProcess
 
 class ManageSpaceActivity: FragmentActivity() {
-    val myApp = application as MyApplication
-    val settingsRepo = myApp.container.settingsRepo
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
+        val myApp = application as MyApplication
+        val settingsRepo = myApp.container.settingsRepo
         super.onCreate(savedInstanceState)
         setContent {
             val theme by myApp.container.themeState.collectAsStateWithLifecycle()

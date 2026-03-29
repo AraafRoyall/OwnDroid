@@ -372,6 +372,7 @@
     <string name="profile_max_time_out_desc">Personal apps will be suspended after the work profile is closed for this amount of time. 0 means no limit. </string>
     <string name="personal_app_suspended_because_timeout">Personal app suspended because of this: %1$s</string>
     <string name="intent_filter">Intent filter</string>
+    <string name="history">History</string>
     <string name="presets">Presets</string>
     <string name="open_file">Open file</string>
     <string name="share">Share</string>
@@ -716,7 +717,7 @@
     <string name="info_evict_credential_encryption_key">Evict the user\'s credential encryption key from the keyring. The user\'s credential will need to be entered again in order to derive the credential encryption key that will be stored back in the keyring for future use. In order to secure user data, the user will be stopped and restarted.</string>
     <string name="info_reboot">You can\'t use this function if there is an ongoing call on the device.</string>
     <string name="info_content_protection_policy">Content protection policy controls scanning for deceptive apps.</string>
-    <string name="info_permission_policy">Set the default response for future runtime permission requests by applications.</string>
+    <string name="info_permission_policy">Set the default response for future runtime permission requests by applications. Only OwnDroid can change the grant state of permissions granted or denied by this policy</string>
     <string name="info_mte_policy">Set the Memory Tagging Extension policy. Reboot the device to apply changes.</string>
     <string name="info_nearby_app_streaming_policy">App streaming is when the device starts an app on a virtual display and sends a video stream of the app to nearby devices.</string>
     <string name="info_nearby_notification_streaming_policy">Notification streaming is sending notification data from pre-installed apps to nearby devices.</string>

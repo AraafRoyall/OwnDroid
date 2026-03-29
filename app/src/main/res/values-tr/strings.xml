@@ -650,7 +650,7 @@
     <string name="info_evict_credential_encryption_key">Kullanıcının kimlik şifreleme anahtarını anahtar zincirinden kaldırır. Kullanıcının kimlik bilgisi, gelecekteki kullanım için anahtar zincirinde saklanacak kimlik şifreleme anahtarını türetmek için tekrar girilmelidir. Kullanıcı verilerini güvence altına almak için kullanıcı durdurulur ve yeniden başlatılır.</string>
     <string name="info_reboot">Cihazda devam eden bir arama varsa bu işlevi kullanamazsınız.</string>
     <string name="info_content_protection_policy">İçerik koruma politikası, yanıltıcı uygulamaları taramayı kontrol eder.</string>
-    <string name="info_permission_policy">Uygulamalar tarafından gelecekteki çalışma zamanı izin talepleri için varsayılan yanıtı ayarlar.</string>
+    <string name="info_permission_policy">Uygulamalar tarafından gelecekteki çalışma zamanı izin talepleri için varsayılan yanıtı ayarlar.</string> <!--TODO-->
     <string name="info_mte_policy">Bellek Etiketleme Uzantısı politikasını ayarlar. Değişiklikleri uygulamak için cihazı yeniden başlatın.</string>
     <string name="info_nearby_app_streaming_policy">Uygulama akışı, cihazın bir uygulamayı sanal bir ekranda başlatması ve uygulamanın video akışını yakındaki cihazlara göndermesidir.</string>
     <string name="info_nearby_notification_streaming_policy">Bildirim akışı, önceden yüklenmiş uygulamalardan bildirim verilerini yakındaki cihazlara göndermektir.</string>

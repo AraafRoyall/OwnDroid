@@ -27,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,8 +37,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,14 +57,17 @@ import com.bintianqi.owndroid.R
 import com.bintianqi.owndroid.ui.MyLazyScaffold
 import com.bintianqi.owndroid.ui.NavIcon
 import com.bintianqi.owndroid.ui.Notes
+import com.bintianqi.owndroid.ui.navigation.Destination
 import com.bintianqi.owndroid.utils.BottomPadding
 import com.bintianqi.owndroid.utils.HorizontalPadding
 import com.bintianqi.owndroid.utils.adaptiveInsets
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrossProfileIntentFilterScreen(
-    vm: CrossProfileIntentFilterViewModel, onNavigateUp: () -> Unit, navigateToPresets: () -> Unit
+    vm: CrossProfileIntentFilterViewModel, onNavigateUp: () -> Unit, navigate: (Destination) -> Unit
 ) {
     val focusMgr = LocalFocusManager.current
     var action by remember { mutableStateOf("") }
@@ -92,9 +98,19 @@ fun CrossProfileIntentFilterScreen(
                         }
                         DropdownMenu(menu, { menu = false }) {
                             DropdownMenuItem(
+                                { Text(stringResource(R.string.history)) },
+                                {
+                                    navigate(Destination.CrossProfileIntentFilterHistory)
+                                    menu = false
+                                },
+                                leadingIcon = {
+                                    Icon(painterResource(R.drawable.history_fill0), null)
+                                }
+                            )
+                            DropdownMenuItem(
                                 { Text(stringResource(R.string.presets)) },
                                 {
-                                    navigateToPresets()
+                                    navigate(Destination.CrossProfileIntentFilterPresets)
                                     menu = false
                                 },
                                 leadingIcon = {
@@ -281,5 +297,46 @@ fun CrossProfileIntentFilterPresetsScreen(
             },
             onDismissRequest = { dialog = null }
         )
+    }
+}
+
+@Composable
+fun CrossProfileIntentFilterHistoryScreen(
+    vm: CrossProfileIntentFilterViewModel, navigateUp: () -> Unit
+) {
+    val list = remember { mutableStateListOf<IntentFilterOptions>() }
+    LaunchedEffect(Unit) {
+        launch(Dispatchers.IO) {
+            list.addAll(vm.getHistory())
+        }
+    }
+    MyLazyScaffold(R.string.history, navigateUp) {
+        items(list) {
+            Column {
+                Column(Modifier.padding(HorizontalPadding, 4.dp)) {
+                    Text(it.action)
+                    if (it.category.isNotEmpty()) {
+                        Text(
+                            it.category, Modifier.alpha(0.7F),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    if (it.mimeType.isNotEmpty()) {
+                        Text(
+                            it.mimeType, Modifier.alpha(0.7F),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    Text(
+                        stringResource(directionTextMap[it.direction]!!),
+                        Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                HorizontalDivider()
+            }
+        }
+        item {
+            Spacer(Modifier.height(BottomPadding))
+        }
     }
 }
