@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
@@ -32,10 +30,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -55,12 +51,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.bintianqi.owndroid.R
 import com.bintianqi.owndroid.ui.MyLazyScaffold
-import com.bintianqi.owndroid.ui.NavIcon
+import com.bintianqi.owndroid.ui.MySmallTitleScaffold
 import com.bintianqi.owndroid.ui.Notes
 import com.bintianqi.owndroid.ui.navigation.Destination
 import com.bintianqi.owndroid.utils.BottomPadding
 import com.bintianqi.owndroid.utils.HorizontalPadding
-import com.bintianqi.owndroid.utils.adaptiveInsets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -85,141 +80,127 @@ fun CrossProfileIntentFilterScreen(
     ) {
         if (it != null) vm.exportFilters(it)
     }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.intent_filter)) },
-                navigationIcon = { NavIcon(onNavigateUp) },
-                actions = {
-                    var menu by remember { mutableStateOf(false) }
-                    Box {
-                        IconButton({ menu = !menu }) {
-                            Icon(Icons.Default.MoreVert, null)
-                        }
-                        DropdownMenu(menu, { menu = false }) {
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.history)) },
-                                {
-                                    navigate(Destination.CrossProfileIntentFilterHistory)
-                                    menu = false
-                                },
-                                leadingIcon = {
-                                    Icon(painterResource(R.drawable.history_fill0), null)
-                                }
-                            )
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.presets)) },
-                                {
-                                    navigate(Destination.CrossProfileIntentFilterPresets)
-                                    menu = false
-                                },
-                                leadingIcon = {
-                                    Icon(painterResource(R.drawable.list_fill0), null)
-                                }
-                            )
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.import_str)) },
-                                {
-                                    importLauncher.launch(arrayOf("application/json"))
-                                    menu = false
-                                },
-                                leadingIcon = {
-                                    Icon(painterResource(R.drawable.file_open_fill0), null)
-                                }
-                            )
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.export)) },
-                                {
-                                    exportLauncher.launch("owndroid_intent_filters")
-                                    menu = false
-                                },
-                                leadingIcon = {
-                                    Icon(painterResource(R.drawable.file_export_fill0), null)
-                                }
-                            )
-                        }
-                    }
+    MySmallTitleScaffold(
+        R.string.intent_filter, onNavigateUp, 16.dp,
+        {
+            var menu by remember { mutableStateOf(false) }
+            Box {
+                IconButton({ menu = !menu }) {
+                    Icon(Icons.Default.MoreVert, null)
                 }
-            )
-        },
-        contentWindowInsets = adaptiveInsets()
-    ) { paddingValues ->
-        Column(
-            Modifier
-                .padding(paddingValues)
-                .padding(horizontal = HorizontalPadding)
-                .verticalScroll(rememberScrollState())
-        ) {
-            OutlinedTextField(
-                value = action, onValueChange = { action = it },
-                label = { Text("Action") },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = { focusMgr.clearFocus() }),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(customCategory, {
-                    customCategory = it
-                    category = ""
-                })
-                OutlinedTextField(
-                    category, { category = it }, Modifier.fillMaxWidth(),
-                    label = { Text("Category") }, enabled = customCategory
-                )
-            }
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(customMimeType, {
-                    customMimeType = it
-                    mimeType = ""
-                })
-                OutlinedTextField(
-                    mimeType, { mimeType = it }, Modifier.fillMaxWidth(),
-                    label = { Text("MIME type") }, enabled = customMimeType
-                )
-            }
-            ExposedDropdownMenuBox(dropdown, { dropdown = it }, Modifier.padding(vertical = 5.dp)) {
-                OutlinedTextField(
-                    stringResource(directionTextMap[direction]!!), {},
-                    Modifier
-                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
-                        .fillMaxWidth(),
-                    label = { Text(stringResource(R.string.direction)) }, readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdown) }
-                )
-                ExposedDropdownMenu(dropdown, { dropdown = false }) {
-                    directionTextMap.forEach {
-                        DropdownMenuItem({ Text(stringResource(it.value)) }, {
-                            direction = it.key
-                            dropdown = false
-                        })
-                    }
+                DropdownMenu(menu, { menu = false }) {
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.history)) },
+                        {
+                            navigate(Destination.CrossProfileIntentFilterHistory)
+                            menu = false
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.history_fill0), null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.presets)) },
+                        {
+                            navigate(Destination.CrossProfileIntentFilterPresets)
+                            menu = false
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.list_fill0), null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.import_str)) },
+                        {
+                            importLauncher.launch(arrayOf("application/json"))
+                            menu = false
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.file_open_fill0), null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.export)) },
+                        {
+                            exportLauncher.launch("owndroid_intent_filters")
+                            menu = false
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.file_export_fill0), null)
+                        }
+                    )
                 }
             }
-            Button(
-                {
-                    vm.addFilter(IntentFilterOptions(action, category, mimeType, direction))
-                },
-                Modifier.fillMaxWidth(),
-                enabled = action.isNotBlank() && (!customCategory || category.isNotBlank()) &&
-                        (!customMimeType || mimeType.isNotBlank())
-            ) {
-                Text(stringResource(R.string.add))
-            }
-            Button(
-                {
-                    vm.clearFilters()
-                },
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp)
-            ) {
-                Text(stringResource(R.string.clear_cross_profile_filters))
-            }
-            Notes(R.string.info_cross_profile_intent_filter)
-            Spacer(Modifier.height(BottomPadding))
         }
+    ) {
+        OutlinedTextField(
+            value = action, onValueChange = { action = it },
+            label = { Text("Action") },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = { focusMgr.clearFocus() }),
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(customCategory, {
+                customCategory = it
+                category = ""
+            })
+            OutlinedTextField(
+                category, { category = it }, Modifier.fillMaxWidth(),
+                label = { Text("Category") }, enabled = customCategory
+            )
+        }
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(customMimeType, {
+                customMimeType = it
+                mimeType = ""
+            })
+            OutlinedTextField(
+                mimeType, { mimeType = it }, Modifier.fillMaxWidth(),
+                label = { Text("MIME type") }, enabled = customMimeType
+            )
+        }
+        ExposedDropdownMenuBox(dropdown, { dropdown = it }, Modifier.padding(vertical = 5.dp)) {
+            OutlinedTextField(
+                stringResource(directionTextMap[direction]!!), {},
+                Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable)
+                    .fillMaxWidth(),
+                label = { Text(stringResource(R.string.direction)) }, readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(dropdown) }
+            )
+            ExposedDropdownMenu(dropdown, { dropdown = false }) {
+                directionTextMap.forEach {
+                    DropdownMenuItem({ Text(stringResource(it.value)) }, {
+                        direction = it.key
+                        dropdown = false
+                    })
+                }
+            }
+        }
+        Button(
+            {
+                vm.addFilter(IntentFilterOptions(action, category, mimeType, direction))
+            },
+            Modifier.fillMaxWidth(),
+            enabled = action.isNotBlank() && (!customCategory || category.isNotBlank()) &&
+                    (!customMimeType || mimeType.isNotBlank())
+        ) {
+            Text(stringResource(R.string.add))
+        }
+        Button(
+            {
+                vm.clearFilters()
+            },
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 6.dp)
+        ) {
+            Text(stringResource(R.string.clear_cross_profile_filters))
+        }
+        Notes(R.string.info_cross_profile_intent_filter)
     }
 }
 

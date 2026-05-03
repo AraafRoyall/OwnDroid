@@ -11,17 +11,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -35,7 +32,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
@@ -47,7 +43,6 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,7 +57,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalResources
@@ -105,129 +99,113 @@ fun ApplicationsFeaturesScreen(
     onSwitchView: () -> Unit
 ) {
     val context = LocalContext.current
-    val sb = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    Scaffold(
-        Modifier.nestedScroll(sb.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                { Text(stringResource(R.string.applications)) },
-                navigationIcon = { NavIcon(onNavigateUp) },
-                actions = {
-                    Box {
-                        var dropdown by remember { mutableStateOf(false) }
-                        IconButton({ dropdown = true }) {
-                            Icon(Icons.Default.MoreVert, null)
-                        }
-                        DropdownMenu(dropdown, { dropdown = false }) {
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.apps_view)) },
-                                {
-                                    dropdown = false
-                                    onSwitchView()
-                                },
-                                leadingIcon = { RadioButton(false, null) }
-                            )
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.features_view)) },
-                                {},
-                                leadingIcon = { RadioButton(true, null) }
-                            )
-                        }
-                    }
-                },
-                scrollBehavior = sb
-            )
-        },
-        contentWindowInsets = adaptiveInsets()
-    ) { paddingValues ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 80.dp)
-        ) {
-            val privilege by vm.privilegeState.collectAsStateWithLifecycle()
-            if (VERSION.SDK_INT >= 24) FunctionItem(
-                R.string.suspend, icon = R.drawable.block_fill0
-            ) {
-                onNavigate(Destination.Suspend)
-            }
-            FunctionItem(R.string.hide, icon = R.drawable.visibility_off_fill0) {
-                onNavigate(Destination.Hide)
-            }
-            FunctionItem(R.string.block_uninstall, icon = R.drawable.delete_forever_fill0) {
-                onNavigate(Destination.BlockUninstall)
-            }
-            if (VERSION.SDK_INT >= 30 && (privilege.device || (VERSION.SDK_INT >= 33 && privilege.profile))) {
-                FunctionItem(R.string.disable_user_control, icon = R.drawable.do_not_touch_fill0) {
-                    onNavigate(Destination.DisableUserControl)
+    MyScaffold(
+        R.string.applications, onNavigateUp, 0.dp,
+        {
+            Box {
+                var dropdown by remember { mutableStateOf(false) }
+                IconButton({ dropdown = true }) {
+                    Icon(Icons.Default.MoreVert, null)
                 }
-            }
-            FunctionItem(R.string.permissions, icon = R.drawable.shield_fill0) {
-                onNavigate(Destination.PermissionManager)
-            }
-            if (VERSION.SDK_INT >= 28) {
-                FunctionItem(R.string.disable_metered_data, icon = R.drawable.money_off_fill0) {
-                    onNavigate(Destination.DisableMeteredData)
-                }
-            }
-            if (VERSION.SDK_INT >= 28) {
-                FunctionItem(R.string.clear_app_storage, icon = R.drawable.mop_fill0) {
-                    onNavigate(Destination.ClearAppStorage)
-                }
-            }
-            FunctionItem(R.string.install_app, icon = R.drawable.install_mobile_fill0) {
-                context.startActivity(Intent(context, AppInstallerActivity::class.java))
-            }
-            FunctionItem(R.string.uninstall_app, icon = R.drawable.delete_fill0) {
-                onNavigate(Destination.UninstallApp)
-            }
-            if (VERSION.SDK_INT >= 28 && privilege.device) {
-                FunctionItem(R.string.keep_uninstalled_packages, icon = R.drawable.delete_fill0) {
-                    onNavigate(Destination.KeepUninstalledPackages)
-                }
-            }
-            if (VERSION.SDK_INT >= 28 && (privilege.device || (privilege.profile && privilege.affiliated))) {
-                FunctionItem(
-                    R.string.install_existing_app, icon = R.drawable.install_mobile_fill0
-                ) {
-                    onNavigate(Destination.InstallExistingApp)
-                }
-            }
-            if (VERSION.SDK_INT >= 30 && privilege.work) {
-                FunctionItem(R.string.cross_profile_apps, icon = R.drawable.work_fill0) {
-                    onNavigate(Destination.CrossProfilePackages)
-                }
-            }
-            if (privilege.work) {
-                FunctionItem(R.string.cross_profile_widget, icon = R.drawable.widgets_fill0) {
-                    onNavigate(Destination.CrossProfileWidgetProviders)
-                }
-            }
-            if (VERSION.SDK_INT >= 34 && privilege.device) {
-                FunctionItem(R.string.credential_manager_policy, icon = R.drawable.license_fill0) {
-                    onNavigate(Destination.CredentialManagerPolicy)
-                }
-            }
-            FunctionItem(
-                R.string.permitted_accessibility_services,
-                icon = R.drawable.settings_accessibility_fill0
-            ) {
-                onNavigate(Destination.PermittedAccessibilityServices)
-            }
-            FunctionItem(R.string.permitted_ime, icon = R.drawable.keyboard_fill0) {
-                onNavigate(Destination.PermittedInputMethods)
-            }
-            FunctionItem(R.string.enable_system_app, icon = R.drawable.enable_fill0) {
-                onNavigate(Destination.EnableSystemApp)
-            }
-            if (VERSION.SDK_INT >= 34 && (privilege.device || privilege.work)) {
-                FunctionItem(R.string.set_default_dialer, icon = R.drawable.call_fill0) {
-                    onNavigate(Destination.SetDefaultDialer)
+                DropdownMenu(dropdown, { dropdown = false }) {
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.apps_view)) },
+                        {
+                            dropdown = false
+                            onSwitchView()
+                        },
+                        leadingIcon = { RadioButton(false, null) }
+                    )
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.features_view)) },
+                        {},
+                        leadingIcon = { RadioButton(true, null) }
+                    )
                 }
             }
         }
+    ) {
+        val privilege by vm.privilegeState.collectAsStateWithLifecycle()
+        if (VERSION.SDK_INT >= 24) FunctionItem(
+            R.string.suspend, icon = R.drawable.block_fill0
+        ) {
+            onNavigate(Destination.Suspend)
+        }
+        FunctionItem(R.string.hide, icon = R.drawable.visibility_off_fill0) {
+            onNavigate(Destination.Hide)
+        }
+        FunctionItem(R.string.block_uninstall, icon = R.drawable.delete_forever_fill0) {
+            onNavigate(Destination.BlockUninstall)
+        }
+        if (VERSION.SDK_INT >= 30 && (privilege.device || (VERSION.SDK_INT >= 33 && privilege.profile))) {
+            FunctionItem(R.string.disable_user_control, icon = R.drawable.do_not_touch_fill0) {
+                onNavigate(Destination.DisableUserControl)
+            }
+        }
+        FunctionItem(R.string.permissions, icon = R.drawable.shield_fill0) {
+            onNavigate(Destination.PermissionManager)
+        }
+        if (VERSION.SDK_INT >= 28) {
+            FunctionItem(R.string.disable_metered_data, icon = R.drawable.money_off_fill0) {
+                onNavigate(Destination.DisableMeteredData)
+            }
+        }
+        if (VERSION.SDK_INT >= 28) {
+            FunctionItem(R.string.clear_app_storage, icon = R.drawable.mop_fill0) {
+                onNavigate(Destination.ClearAppStorage)
+            }
+        }
+        FunctionItem(R.string.install_app, icon = R.drawable.install_mobile_fill0) {
+            context.startActivity(Intent(context, AppInstallerActivity::class.java))
+        }
+        FunctionItem(R.string.uninstall_app, icon = R.drawable.delete_fill0) {
+            onNavigate(Destination.UninstallApp)
+        }
+        if (VERSION.SDK_INT >= 28 && privilege.device) {
+            FunctionItem(R.string.keep_uninstalled_packages, icon = R.drawable.delete_fill0) {
+                onNavigate(Destination.KeepUninstalledPackages)
+            }
+        }
+        if (VERSION.SDK_INT >= 28 && (privilege.device || (privilege.profile && privilege.affiliated))) {
+            FunctionItem(
+                R.string.install_existing_app, icon = R.drawable.install_mobile_fill0
+            ) {
+                onNavigate(Destination.InstallExistingApp)
+            }
+        }
+        if (VERSION.SDK_INT >= 30 && privilege.work) {
+            FunctionItem(R.string.cross_profile_apps, icon = R.drawable.work_fill0) {
+                onNavigate(Destination.CrossProfilePackages)
+            }
+        }
+        if (privilege.work) {
+            FunctionItem(R.string.cross_profile_widget, icon = R.drawable.widgets_fill0) {
+                onNavigate(Destination.CrossProfileWidgetProviders)
+            }
+        }
+        if (VERSION.SDK_INT >= 34 && privilege.device) {
+            FunctionItem(R.string.credential_manager_policy, icon = R.drawable.license_fill0) {
+                onNavigate(Destination.CredentialManagerPolicy)
+            }
+        }
+        FunctionItem(
+            R.string.permitted_accessibility_services,
+            icon = R.drawable.settings_accessibility_fill0
+        ) {
+            onNavigate(Destination.PermittedAccessibilityServices)
+        }
+        FunctionItem(R.string.permitted_ime, icon = R.drawable.keyboard_fill0) {
+            onNavigate(Destination.PermittedInputMethods)
+        }
+        FunctionItem(R.string.enable_system_app, icon = R.drawable.enable_fill0) {
+            onNavigate(Destination.EnableSystemApp)
+        }
+        if (VERSION.SDK_INT >= 34 && (privilege.device || privilege.work)) {
+            FunctionItem(R.string.set_default_dialer, icon = R.drawable.call_fill0) {
+                onNavigate(Destination.SetDefaultDialer)
+            }
+        }
+        Spacer(Modifier.height(BottomPadding))
     }
 }
 

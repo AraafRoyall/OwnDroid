@@ -48,6 +48,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.bintianqi.owndroid.R
+import com.bintianqi.owndroid.ui.MasterSwitch
 import com.bintianqi.owndroid.ui.MyScaffold
 import com.bintianqi.owndroid.ui.MySmallTitleScaffold
 import com.bintianqi.owndroid.ui.SwitchItem
@@ -62,7 +63,7 @@ fun OverrideApnScreen(
     val configs by vm.configsState.collectAsState()
     LaunchedEffect(Unit) { vm.getConfigs() }
     MyScaffold(R.string.override_apn, onNavigateUp, 0.dp) {
-        SwitchItem(R.string.enable, enabled, vm::setEnabled)
+        MasterSwitch(R.string.enable, enabled, vm::setEnabled)
         configs.forEach {
             Row(
                 Modifier

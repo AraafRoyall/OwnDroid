@@ -45,11 +45,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bintianqi.owndroid.R
+import com.bintianqi.owndroid.ui.MyLazyScaffold
 import com.bintianqi.owndroid.ui.NavIcon
 import com.bintianqi.owndroid.ui.PackageNameTextField
 import com.bintianqi.owndroid.utils.BottomPadding
 import com.bintianqi.owndroid.utils.HorizontalPadding
-import com.bintianqi.owndroid.utils.adaptiveInsets
 import com.bintianqi.owndroid.utils.parsePackageNames
 import kotlinx.coroutines.channels.Channel
 
@@ -152,67 +152,59 @@ fun EditAppGroupScreen(
             vm.setGroupApp(it, true)
         }
     }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                {},
-                navigationIcon = { NavIcon(navigateUp) },
-                actions = {
-                    if (uiState.id != null) IconButton({
-                        vm.deleteGroup()
-                        navigateUp()
-                    }) {
-                        Icon(Icons.Outlined.Delete, null)
-                    }
-                    FilledIconButton(
-                        {
-                            vm.setGroup()
-                            navigateUp()
-                        },
-                        enabled = uiState.name.isNotBlank() && uiState.apps.isNotEmpty()
-                    ) {
-                        Icon(Icons.Default.Check, null)
-                    }
-                }
+    MyLazyScaffold(
+        R.string.place_holder, navigateUp,
+        {
+            if (uiState.id != null) IconButton({
+                vm.deleteGroup()
+                navigateUp()
+            }) {
+                Icon(Icons.Outlined.Delete, null)
+            }
+            FilledIconButton(
+                {
+                    vm.setGroup()
+                    navigateUp()
+                },
+                enabled = uiState.name.isNotBlank() && uiState.apps.isNotEmpty()
+            ) {
+                Icon(Icons.Default.Check, null)
+            }
+        }
+    ) {
+        item {
+            OutlinedTextField(
+                uiState.name, vm::setGroupName,
+                Modifier
+                    .fillMaxWidth()
+                    .padding(HorizontalPadding, 8.dp),
+                label = { Text(stringResource(R.string.name)) }
             )
-        },
-        contentWindowInsets = adaptiveInsets()
-    ) { paddingValues ->
-        LazyColumn(Modifier.padding(paddingValues)) {
-            item {
-                OutlinedTextField(
-                    uiState.name, vm::setGroupName,
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(HorizontalPadding, 8.dp),
-                    label = { Text(stringResource(R.string.name)) }
-                )
+        }
+        items(uiState.apps, { it.name }) {
+            ApplicationItem(it) {
+                vm.setGroupApp(it.name, false)
             }
-            items(uiState.apps, { it.name }) {
-                ApplicationItem(it) {
-                    vm.setGroupApp(it.name, false)
-                }
+        }
+        item {
+            PackageNameTextField(input, onChoosePackage,
+                Modifier.padding(HorizontalPadding, 8.dp)) { input = it }
+            Button(
+                {
+                    inputPackages.forEach {
+                        vm.setGroupApp(it, true)
+                    }
+                    input = ""
+                },
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = HorizontalPadding)
+                    .padding(bottom = 10.dp),
+                inputPackages.all { pkg -> pkg !in uiState.apps.map { it.name } }
+            ) {
+                Text(stringResource(R.string.add))
             }
-            item {
-                PackageNameTextField(input, onChoosePackage,
-                    Modifier.padding(HorizontalPadding, 8.dp)) { input = it }
-                Button(
-                    {
-                        inputPackages.forEach {
-                            vm.setGroupApp(it, true)
-                        }
-                        input = ""
-                    },
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = HorizontalPadding)
-                        .padding(bottom = 10.dp),
-                    inputPackages.all { pkg -> pkg !in uiState.apps.map { it.name } }
-                ) {
-                    Text(stringResource(R.string.add))
-                }
-                Spacer(Modifier.height(BottomPadding))
-            }
+            Spacer(Modifier.height(BottomPadding))
         }
     }
 }

@@ -14,7 +14,6 @@ import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.os.Build
 import android.os.Build.VERSION
 import android.widget.Toast
 import androidx.compose.foundation.gestures.awaitEachGesture

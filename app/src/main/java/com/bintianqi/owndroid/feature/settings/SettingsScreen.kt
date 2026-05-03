@@ -9,16 +9,12 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
@@ -29,12 +25,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,7 +37,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -58,14 +50,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bintianqi.owndroid.R
 import com.bintianqi.owndroid.ui.FunctionItem
 import com.bintianqi.owndroid.ui.MyScaffold
-import com.bintianqi.owndroid.ui.NavIcon
 import com.bintianqi.owndroid.ui.Notes
 import com.bintianqi.owndroid.ui.SwitchItem
 import com.bintianqi.owndroid.ui.navigation.Destination
 import com.bintianqi.owndroid.utils.BottomPadding
 import com.bintianqi.owndroid.utils.MyNotificationChannel
 import com.bintianqi.owndroid.utils.NotificationType
-import com.bintianqi.owndroid.utils.adaptiveInsets
 import com.bintianqi.owndroid.utils.generateBase64Key
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -82,76 +72,61 @@ fun SettingsScreen(
         rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("text/plain")) {
             if (it != null) vm.exportLogs(it)
         }
-    val sb = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var dropdown by remember { mutableStateOf(false) }
-    Scaffold(
-        Modifier.nestedScroll(sb.nestedScrollConnection),
-        topBar = {
-            LargeTopAppBar(
-                { Text(stringResource(R.string.settings)) },
-                navigationIcon = { NavIcon(onNavigateUp) },
-                scrollBehavior = sb,
-                actions = {
-                    Box {
-                        IconButton({ dropdown = true }) {
-                            Icon(Icons.Default.MoreVert, null)
+    MyScaffold(
+        R.string.settings, onNavigateUp, 0.dp,
+        {
+
+            Box {
+                IconButton({ dropdown = true }) {
+                    Icon(Icons.Default.MoreVert, null)
+                }
+                DropdownMenu(dropdown, { dropdown = false }) {
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.export_logs)) },
+                        {
+                            dropdown = false
+                            val time =
+                                SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+                                    .format(Date(System.currentTimeMillis()))
+                            exportLogsLauncher.launch("owndroid_log_$time")
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.description_fill0), null)
                         }
-                        DropdownMenu(dropdown, { dropdown = false }) {
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.export_logs)) },
-                                {
-                                    dropdown = false
-                                    val time =
-                                        SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
-                                            .format(Date(System.currentTimeMillis()))
-                                    exportLogsLauncher.launch("owndroid_log_$time")
-                                },
-                                leadingIcon = {
-                                    Icon(painterResource(R.drawable.description_fill0), null)
-                                }
-                            )
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.exit)) },
-                                { exitProcess(0) },
-                                leadingIcon = { Icon(Icons.Default.Close, null) }
-                            )
-                        }
-                    }
-                }
-            )
-        },
-        contentWindowInsets = adaptiveInsets()
-    ) { paddingValues ->
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-        ) {
-            FunctionItem(R.string.options, icon = R.drawable.tune_fill0) {
-                onNavigate(Destination.SettingsOptions)
-            }
-            FunctionItem(R.string.appearance, icon = R.drawable.format_paint_fill0) {
-                onNavigate(Destination.AppearanceSettings)
-            }
-            FunctionItem(R.string.app_lock, icon = R.drawable.lock_fill0) {
-                onNavigate(Destination.AppLockSettings)
-            }
-            if (privilege.device || privilege.profile) {
-                FunctionItem(R.string.api, icon = R.drawable.code_fill0) {
-                    onNavigate(Destination.ApiSettings)
+                    )
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.exit)) },
+                        { exitProcess(0) },
+                        leadingIcon = { Icon(Icons.Default.Close, null) }
+                    )
                 }
             }
-            if (privilege.device && !privilege.dhizuku) {
-                FunctionItem(R.string.notifications, icon = R.drawable.notifications_fill0) {
-                    onNavigate(Destination.NotificationSettings)
-                }
-            }
-            FunctionItem(R.string.about, icon = R.drawable.info_fill0) {
-                onNavigate(Destination.About)
-            }
-            Spacer(Modifier.height(BottomPadding))
         }
+    ) {
+        FunctionItem(R.string.options, icon = R.drawable.tune_fill0) {
+            onNavigate(Destination.SettingsOptions)
+        }
+        FunctionItem(R.string.appearance, icon = R.drawable.format_paint_fill0) {
+            onNavigate(Destination.AppearanceSettings)
+        }
+        FunctionItem(R.string.app_lock, icon = R.drawable.lock_fill0) {
+            onNavigate(Destination.AppLockSettings)
+        }
+        if (privilege.device || privilege.profile) {
+            FunctionItem(R.string.api, icon = R.drawable.code_fill0) {
+                onNavigate(Destination.ApiSettings)
+            }
+        }
+        if (privilege.device && !privilege.dhizuku) {
+            FunctionItem(R.string.notifications, icon = R.drawable.notifications_fill0) {
+                onNavigate(Destination.NotificationSettings)
+            }
+        }
+        FunctionItem(R.string.about, icon = R.drawable.info_fill0) {
+            onNavigate(Destination.About)
+        }
+        Spacer(Modifier.height(BottomPadding))
     }
 }
 

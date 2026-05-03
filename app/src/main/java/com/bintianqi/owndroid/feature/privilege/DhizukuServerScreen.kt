@@ -35,8 +35,8 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
 import com.bintianqi.owndroid.DhizukuPermissions
 import com.bintianqi.owndroid.R
+import com.bintianqi.owndroid.ui.MasterSwitch
 import com.bintianqi.owndroid.ui.MyLazyScaffold
-import com.bintianqi.owndroid.ui.SwitchItem
 import com.bintianqi.owndroid.utils.AppInfo
 import com.bintianqi.owndroid.utils.HorizontalPadding
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
@@ -54,7 +54,7 @@ fun DhizukuServerSettingsScreen(
     }
     MyLazyScaffold(R.string.dhizuku_server, onNavigateUp) {
         item {
-            SwitchItem(R.string.enable, enabled, vm::setEnabled)
+            MasterSwitch(R.string.enable, enabled, vm::setEnabled)
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
         }
         if (enabled) items(clients) { (client, app) ->

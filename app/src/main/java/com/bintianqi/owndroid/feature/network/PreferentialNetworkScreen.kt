@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -29,9 +27,7 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -48,8 +44,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bintianqi.owndroid.R
+import com.bintianqi.owndroid.ui.MasterSwitch
+import com.bintianqi.owndroid.ui.MyLazyScaffold
 import com.bintianqi.owndroid.ui.MySmallTitleScaffold
-import com.bintianqi.owndroid.ui.NavIcon
 import com.bintianqi.owndroid.ui.SwitchItem
 import com.bintianqi.owndroid.ui.navigation.Destination
 import com.bintianqi.owndroid.utils.HorizontalPadding
@@ -77,80 +74,73 @@ fun PreferentialNetworkServiceScreen(
     ) { uri ->
         if (uri != null) vm.importConfig(uri)
     }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                { Text(stringResource(R.string.preferential_network_service)) },
-                navigationIcon = { NavIcon(onNavigateUp) },
-                actions = {
-                    var menu by remember { mutableStateOf(false) }
-                    Box {
-                        IconButton({ menu = true }) {
-                            Icon(Icons.Default.MoreVert, null)
-                        }
-                        DropdownMenu(menu, { menu = false }) {
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.export)) },
-                                {
-                                    exportLauncher.launch("OwnDroid-preferential-network-config")
-                                    menu = false
-                                },
-                                leadingIcon = {
-                                    Icon(painterResource(R.drawable.file_export_fill0), null)
-                                }
-                            )
-                            DropdownMenuItem(
-                                { Text(stringResource(R.string.import_str)) },
-                                {
-                                    importLauncher.launch(arrayOf("application/json"))
-                                    menu = false
-                                },
-                                leadingIcon = {
-                                    Icon(painterResource(R.drawable.file_open_fill0), null)
-                                }
-                            )
-                        }
-                    }
+    MyLazyScaffold(
+        R.string.preferential_network_service, onNavigateUp,
+        {
+            var menu by remember { mutableStateOf(false) }
+            Box {
+                IconButton({ menu = true }) {
+                    Icon(Icons.Default.MoreVert, null)
                 }
-            )
+                DropdownMenu(menu, { menu = false }) {
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.export)) },
+                        {
+                            exportLauncher.launch("OwnDroid-preferential-network-config")
+                            menu = false
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.file_export_fill0), null)
+                        }
+                    )
+                    DropdownMenuItem(
+                        { Text(stringResource(R.string.import_str)) },
+                        {
+                            importLauncher.launch(arrayOf("application/json"))
+                            menu = false
+                        },
+                        leadingIcon = {
+                            Icon(painterResource(R.drawable.file_open_fill0), null)
+                        }
+                    )
+                }
+            }
         }
-    ) { paddingValues ->
-        LazyColumn(Modifier.padding(paddingValues)) {
-            item {
-                SwitchItem(R.string.enabled, masterEnabled, vm::setEnabled)
-                Spacer(Modifier.padding(vertical = 4.dp))
+    ) {
+        item {
+            MasterSwitch(R.string.enabled, masterEnabled, vm::setEnabled)
+            Spacer(Modifier.padding(vertical = 4.dp))
+        }
+        itemsIndexed(configs) { index, config ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp, 4.dp, 8.dp, 4.dp),
+                Arrangement.SpaceBetween, Alignment.CenterVertically
+            ) {
+                Text(config.id.toString())
+                IconButton({
+                    vm.selectedConfigIndex = index
+                    onNavigate(Destination.AddPreferentialNetworkServiceConfig)
+                }) {
+                    Icon(Icons.Default.Edit, stringResource(R.string.edit))
+                }
             }
-            itemsIndexed(configs) { index, config ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp, 4.dp, 8.dp, 4.dp),
-                    Arrangement.SpaceBetween, Alignment.CenterVertically
-                ) {
-                    Text(config.id.toString())
-                    IconButton({
-                        vm.selectedConfigIndex = index
+        }
+        item {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp)
+                    .clickable {
+                        vm.selectedConfigIndex = -1
                         onNavigate(Destination.AddPreferentialNetworkServiceConfig)
-                    }) {
-                        Icon(Icons.Default.Edit, stringResource(R.string.edit))
                     }
-                }
-            }
-            item {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .clickable {
-                            vm.selectedConfigIndex = -1
-                            onNavigate(Destination.AddPreferentialNetworkServiceConfig)
-                        }
-                        .padding(horizontal = 8.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(Icons.Default.Add, null, Modifier.padding(horizontal = 8.dp))
-                    Text(stringResource(R.string.add_config))
-                }
+                    .padding(horizontal = 8.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Default.Add, null, Modifier.padding(horizontal = 8.dp))
+                Text(stringResource(R.string.add_config))
             }
         }
     }
