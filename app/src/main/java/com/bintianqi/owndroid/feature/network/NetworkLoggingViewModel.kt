@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bintianqi.owndroid.MyApplication
 import com.bintianqi.owndroid.PrivilegeHelper
+import com.bintianqi.owndroid.utils.ToastChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class NetworkLoggingViewModel(
-    val application: MyApplication, val ph: PrivilegeHelper,
+    val application: MyApplication, val ph: PrivilegeHelper, val tc: ToastChannel,
     val repo: NetworkLoggingRepository
 ) : ViewModel() {
     val enabledState = MutableStateFlow(false)
@@ -41,6 +42,7 @@ class NetworkLoggingViewModel(
             application.contentResolver.openOutputStream(uri)?.use {
                 repo.exportNetworkLogs(it)
             }
+            tc.sendStatus(true)
             withContext(Dispatchers.Main) { callback() }
         }
     }

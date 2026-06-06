@@ -31,6 +31,7 @@ class LockTaskModeViewModel(
             dar,
             packagesState.value.map { it.name }
                 .run { if (status) plus(name) else minus(name) }
+                .distinct()
                 .toTypedArray()
         )
         getPackages()

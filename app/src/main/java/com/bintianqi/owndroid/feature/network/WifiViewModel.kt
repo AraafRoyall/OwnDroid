@@ -80,7 +80,9 @@ class WifiViewModel(
         conf.SSID = "\"" + info.ssid + "\""
         info.hiddenSsid?.let { conf.hiddenSSID = it }
         if (VERSION.SDK_INT >= 30) info.security?.let { conf.setSecurityParams(it.id) }
-        if (info.security == WifiSecurity.Psk) conf.preSharedKey = info.password
+        if (info.security == WifiSecurity.Psk && info.password.isNotEmpty()) {
+            conf.preSharedKey = '"' + info.password + '"'
+        }
         if (VERSION.SDK_INT >= 33) info.macRandomization?.let {
             conf.macRandomizationSetting = it.id
         }

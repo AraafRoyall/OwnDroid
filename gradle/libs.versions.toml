@@ -1,9 +1,9 @@
 [versions]
-agp = "9.0.1"
-kotlin = "2.3.10"
+agp = "9.2.1"
+kotlin = "2.4.0"
 
-nav3 = "1.0.1"
-composeBom = "2026.03.01"
+nav3 = "1.1.2"
+composeBom = "2026.05.01"
 lifecycle = "2.10.0"
 accompanist-drawablepainter = "0.37.3"
 accompanist-permissions = "0.37.3"
@@ -13,8 +13,8 @@ dhizuku = "2.5.4"
 dhizuku-server = "0.0.10"
 hiddenApiBypass = "6.1"
 libsu = "6.0.0"
-reoderable = "3.0.0"
-serialization = "1.10.0"
+reoderable = "3.1.0"
+serialization = "1.11.0"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -47,4 +47,4 @@ kgp = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.r
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "2.3.10" }
+serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

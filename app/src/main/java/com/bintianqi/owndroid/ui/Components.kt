@@ -5,10 +5,10 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
@@ -43,10 +43,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -196,63 +192,22 @@ fun FullWidthCheckBoxItem(
 @Composable
 fun SwitchItem(
     @StringRes title: Int,
-    desc: String? = null,
-    @DrawableRes icon: Int? = null,
-    getState: () -> Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    enabled: Boolean = true,
-    onClickBlank: (() -> Unit)? = null,
-    padding: Boolean = true
-) {
-    var state by remember { mutableStateOf(getState()) }
-    SwitchItem(
-        title, desc, icon, state, { onCheckedChange(it); state = getState() }, enabled,
-        onClickBlank, padding
-    )
-}
-
-@Composable
-fun SwitchItem(
-    @StringRes title: Int,
-    desc: String? = null,
     @DrawableRes icon: Int? = null,
     state: Boolean,
     onCheckedChange: (Boolean) -> Unit,
-    enabled: Boolean = true,
-    onClickBlank: (() -> Unit)? = null,
     padding: Boolean = true
 ) {
-    Box(
-        modifier = Modifier
+    Row(
+        Modifier
             .fillMaxWidth()
-            .clickable(enabled = onClickBlank != null, onClick = onClickBlank ?: {})
-            .padding(
-                start = if (padding) 25.dp else 0.dp, end = if (padding) 15.dp else 0.dp,
-                top = 5.dp, bottom = 5.dp
-            )
+            .padding(if (padding) 25.dp else 0.dp, 5.dp, if (padding) 15.dp else 0.dp, 5.dp),
+        Arrangement.SpaceBetween, Alignment.CenterVertically
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.align(Alignment.CenterStart)
-        ) {
-            if (icon != null) Icon(
-                painter = painterResource(icon),
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(end = 20.dp)
-                    .offset(x = (-2).dp)
-            )
-            Column(modifier = Modifier.padding(end = 60.dp)) {
-                Text(text = stringResource(title), style = typography.titleLarge)
-                if (desc != null) Text(
-                    text = desc, color = colorScheme.onBackground.copy(alpha = 0.8F)
-                )
-            }
+        Row(Modifier.weight(1F), verticalAlignment = Alignment.CenterVertically) {
+            if (icon != null) Icon(painterResource(icon), null, Modifier.padding(end = 20.dp))
+            Text(stringResource(title), style = typography.titleLarge)
         }
-        Switch(
-            checked = state, onCheckedChange = { onCheckedChange(it) },
-            modifier = Modifier.align(Alignment.CenterEnd), enabled = enabled
-        )
+        Switch(state, onCheckedChange, Modifier.padding(start = 10.dp))
     }
 }
 
@@ -335,6 +290,7 @@ fun MyScaffold(
     @StringRes title: Int,
     onNavIconClicked: () -> Unit,
     horizonPadding: Dp = 16.dp,
+    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
     val sb = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -344,6 +300,7 @@ fun MyScaffold(
             LargeTopAppBar(
                 { Text(stringResource(title)) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
+                actions = actions,
                 scrollBehavior = sb
             )
         },
@@ -367,6 +324,7 @@ fun MyScaffold(
 fun MyLazyScaffold(
     @StringRes title: Int,
     onNavIconClicked: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
     val sb = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -376,6 +334,7 @@ fun MyLazyScaffold(
             LargeTopAppBar(
                 { Text(stringResource(title)) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
+                actions = actions,
                 scrollBehavior = sb
             )
         },
@@ -396,6 +355,7 @@ fun MySmallTitleScaffold(
     @StringRes title: Int,
     onNavIconClicked: () -> Unit,
     horizonPadding: Dp = 16.dp,
+    actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
     Scaffold(
@@ -403,7 +363,7 @@ fun MySmallTitleScaffold(
             TopAppBar(
                 { Text(stringResource(title)) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
-                colors = TopAppBarDefaults.topAppBarColors(colorScheme.surfaceContainer)
+                actions = actions
             )
         },
         contentWindowInsets = adaptiveInsets()
@@ -465,4 +425,19 @@ fun PackageNameTextField(
         ),
         keyboardActions = KeyboardActions { fm.clearFocus() }
     )
+}
+
+@Composable
+fun MasterSwitch(label: Int, state: Boolean, onStateChange: (Boolean) -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(20.dp, 10.dp)
+            .background(colorScheme.primaryContainer, RoundedCornerShape(25.dp))
+            .padding(20.dp, 10.dp),
+        Arrangement.SpaceBetween, Alignment.CenterVertically
+    ) {
+        Text(stringResource(label), style = typography.titleLarge)
+        Switch(state, onStateChange)
+    }
 }

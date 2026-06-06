@@ -66,10 +66,10 @@ class MyViewModelFactory(
             return OverrideApnViewModel(ph, tc) as T
         }
         if (checkType(PreferentialNetworkViewModel::class)) {
-            return PreferentialNetworkViewModel(ph) as T
+            return PreferentialNetworkViewModel(app, ph, tc) as T
         }
         if (checkType(NetworkLoggingViewModel::class)) {
-            return NetworkLoggingViewModel(app, ph, nlRepo) as T
+            return NetworkLoggingViewModel(app, ph, tc, nlRepo) as T
         }
         if (checkType(NetworkViewModel::class)) {
             return NetworkViewModel(ph, tc, ps) as T

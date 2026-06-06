@@ -16,7 +16,7 @@ class OverrideApnViewModel(
     val enabledState = MutableStateFlow(false)
     @RequiresApi(28)
     fun getEnabled() = ph.safeDpmCall {
-        dpm.isOverrideApnEnabled(dar)
+        enabledState.value = dpm.isOverrideApnEnabled(dar)
     }
 
     @RequiresApi(28)

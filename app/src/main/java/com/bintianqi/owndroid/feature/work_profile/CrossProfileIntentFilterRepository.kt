@@ -10,7 +10,7 @@ class CrossProfileIntentFilterRepository(val dbHelper: MyDbHelper) {
         cv.put("category", data.category)
         cv.put("mime_type", data.mimeType)
         cv.put("direction", data.direction)
-        cv.put("time", System.currentTimeMillis());
+        cv.put("time", System.currentTimeMillis())
         dbHelper.writableDatabase.insert("cross_profile_intent_filters", null, cv)
     }
 

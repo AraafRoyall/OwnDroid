@@ -22,9 +22,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bintianqi.owndroid.R
 import com.bintianqi.owndroid.ui.CircularProgressDialog
+import com.bintianqi.owndroid.ui.MasterSwitch
 import com.bintianqi.owndroid.ui.MyScaffold
 import com.bintianqi.owndroid.ui.Notes
-import com.bintianqi.owndroid.ui.SwitchItem
 import com.bintianqi.owndroid.utils.HorizontalPadding
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -54,7 +54,7 @@ fun SecurityLoggingScreen(
         if (it != null) vm.exportPreRebootSecurityLogs(it)
     }
     MyScaffold(R.string.security_logging, onNavigateUp, 0.dp) {
-        SwitchItem(R.string.enable, enabled, vm::setEnabled)
+        MasterSwitch(R.string.enable, enabled, vm::setEnabled)
         Text(
             stringResource(R.string.n_logs_in_total, logsCount),
             Modifier.padding(HorizontalPadding)

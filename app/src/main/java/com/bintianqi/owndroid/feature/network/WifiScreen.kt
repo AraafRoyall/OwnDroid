@@ -320,6 +320,7 @@ private fun SavedNetworks(
                     }
                     Row {
                         FilledTonalIconButton({
+                            vm.selectedWifiInfo = list[dialog]
                             editNetwork(dialog)
                             dialog = -1
                         }) {

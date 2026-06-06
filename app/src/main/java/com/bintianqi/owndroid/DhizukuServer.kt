@@ -80,11 +80,11 @@ class MyDhizukuService(context: Context, admin: ComponentName, client: IDhizukuC
 }
 
 class DhizukuActivity : ComponentActivity() {
-    val settingsRepo = (application as MyApplication).container.settingsRepo
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val settingsRepo = (application as MyApplication).container.settingsRepo
         if (!settingsRepo.data.privilege.dhizukuServer) {
             finish()
             return

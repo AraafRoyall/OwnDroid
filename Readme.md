@@ -92,6 +92,7 @@ Samsung restricts Android's multiple users feature. There is currently no soluti
 On most devices, creating work profile is not allowed by the system when the device owner exist.
 Because the system add `no_add_managed_profile` user restriction when a device owner is set.
 Device owner can't modify user restrictions set by the system, but if your device is rooted, you can disable this restriction by executing the following commands in adb shell.
+Note: the device owner and the work profile owner can't be the same app, or the device owner will lose its privilege during reboot.
 
 ```shell
 pm set-user-restriction no_add_user 0
@@ -99,6 +100,8 @@ pm set-user-restriction no_add_managed_profile 0
 pm set-user-restriction no_add_private_profile 0
 pm set-user-restriction no_add_clone_profile 0
 ```
+
+You should bypass the restrictions at your own risk. It may cause unexpected behavior, for example, the system may delete the user you created silently during reboot.
 
 Some systems disable the feature of adding users in Android settings once a device owner is set.
 You have to create users in OwnDroid. Or if you have root, run the above command in adb shell to remove that restriction.

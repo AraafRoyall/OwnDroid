@@ -90,6 +90,7 @@ user limit reached
 
 在大部分设备上，设置device owner后不能创建工作资料，因为系统在设置device owner时会添加`no_add_managed_profile`等用户限制。
 Device owner不能修改系统设置的用户限制，但如果你有root权限，你可以在adb shell中执行以下命令以关闭这个限制。
+注意：device owner和工作资料的profile owner不能为同一个app，否则device owner可能会在重启时失去特权。
 
 ```shell
 pm set-user-restriction no_add_user 0
@@ -97,6 +98,8 @@ pm set-user-restriction no_add_managed_profile 0
 pm set-user-restriction no_add_private_profile 0
 pm set-user-restriction no_add_clone_profile 0
 ```
+
+请谨慎绕过这些限制。这可能会导致一些预期之外的行为，比如你创建的用户在重启时被删除。
 
 一些系统在设置了device owner后不允许在安卓设置中创建用户，你可以在OwnDroid中创建用户。
 如果你有root，你也可以在adb shell中运行以上命令以解除限制。
