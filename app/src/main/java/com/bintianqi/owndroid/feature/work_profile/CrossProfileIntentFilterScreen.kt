@@ -220,10 +220,11 @@ vm: CrossProfileIntentFilterViewModel, navigateUp: () -> Unit
 	}
 	
 	LaunchedEffect(Unit) {
-		launch(Dispatchers.IO) {
-			enabled.addAll(vm.getHistory())
-		}
-	}
+    val history = kotlinx.coroutines.withContext(Dispatchers.IO) {
+        vm.getHistory()
+    }
+    enabled.addAll(history)
+}
 	
 	MyLazyScaffold(R.string.presets, navigateUp) {
 		items(crossProfileIntentFilterPresets) { preset ->
