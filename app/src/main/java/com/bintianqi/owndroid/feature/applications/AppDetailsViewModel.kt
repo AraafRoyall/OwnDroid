@@ -1,6 +1,7 @@
 package com.bintianqi.owndroid.feature.applications
 
 import android.os.Build.VERSION
+import android.content.pm.PackageManager
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import com.bintianqi.owndroid.MyApplication
@@ -98,10 +99,19 @@ class AppDetailsViewModel(
     val permissionsState = MutableStateFlow(emptyMap<String, Int>())
 
     fun getPermissions() = ph.safeDpmCall {
-        permissionsState.value = runtimePermissions.associate {
+    val info = application.packageManager.getPackageInfo(
+        packageName,
+        PackageManager.GET_PERMISSIONS
+    )
+
+    val requested = info.requestedPermissions?.toSet().orEmpty()
+
+    permissionsState.value = runtimePermissions
+        .filter { it.id in requested }
+        .associate {
             it.id to dpm.getPermissionGrantState(dar, packageName, it.id)
         }
-    }
+}
 
     fun setPermission(permission: String, status: Int) = ph.safeDpmCall {
         val result = dpm.setPermissionGrantState(dar, packageName, permission, status)
