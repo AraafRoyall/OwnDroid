@@ -58,4 +58,29 @@ class CrossProfileIntentFilterViewModel(
     fun getHistory(): List<IntentFilterOptions> {
         return repo.getAllCrossProfileIntentFilters()
     }
+    private fun samePreset(options: IntentFilterOptions, preset: IntentFilterPreset): Boolean {
+    return options.action == preset.action &&
+            options.category == preset.category &&
+            options.mimeType == preset.mimeType
+}
+
+fun removePreset(preset: IntentFilterPreset) = ph.safeDpmCall {
+    val remaining = repo.getAllCrossProfileIntentFilters().filterNot {
+        samePreset(it, preset)
+    }
+
+    dpm.clearCrossProfileIntentFilters(dar)
+    repo.deleteAllCrossProfileIntentFilters()
+
+    remaining.forEach {
+        val filter = IntentFilter(it.action)
+        if (it.category.isNotEmpty()) filter.addCategory(it.category)
+        if (it.mimeType.isNotEmpty()) filter.addDataType(it.mimeType)
+        dpm.addCrossProfileIntentFilter(dar, filter, it.direction)
+        repo.setCrossProfileIntentFilter(it)
+    }
+
+    toastChannel.sendStatus(true)
+}
+
 }
