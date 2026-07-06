@@ -119,7 +119,7 @@ fun AppPermissionsManagerScreen(
     var selectedPermission by remember { mutableStateOf<PermissionItem?>(null) }
     val permissions by vm.permissionsState.collectAsState()
     MyLazyScaffold(R.string.permissions, onNavigateUp) {
-        items(runtimePermissions) {
+        items(runtimePermissions.filter { permissions.containsKey(it.id) }) {
             Row(
                 Modifier
                     .fillMaxWidth()
