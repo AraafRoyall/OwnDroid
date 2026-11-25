@@ -26,8 +26,8 @@ android {
         applicationId = "com.bintianqi.owndroid"
         minSdk = 23
         targetSdk = 37
-        versionCode = 48
-        versionName = "8.4"
+        versionCode = 49
+        versionName = "8.4.1"
     }
 
     buildTypes {
@@ -107,7 +107,8 @@ dependencies {
     implementation(libs.dhizuku.server.api)
     implementation(libs.androidx.fragment)
     implementation(libs.hiddenApiBypass)
-    implementation(libs.libsu)
+    implementation(libs.libsu.core)
+    implementation(libs.libsu.service)
     implementation(libs.reoderable)
     implementation(libs.serialization)
     implementation(libs.zxing.core)

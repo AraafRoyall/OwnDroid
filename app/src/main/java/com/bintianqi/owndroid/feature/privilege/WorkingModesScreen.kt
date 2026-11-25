@@ -32,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.MaterialTheme.typography
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -274,7 +275,9 @@ fun WorkModesScreen(
                         .fillMaxWidth()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    Text(resultText)
+                    SelectionContainer {
+                        Text(resultText)
+                    }
                 }
             },
             confirmButton = {
@@ -303,26 +306,49 @@ fun WorkModesScreen(
                     for (i in (0..2).reversed()) {
                         delay(1000)
                         time = i
+        if (dialog == 4) {
+            var confirmation by rememberSaveable { mutableStateOf("") }
+            AlertDialog(
+                title = { Text(stringResource(R.string.deactivate)) },
+                text = {
+                    val frpNotice by vm.frpNoticeState.collectAsState()
+                    LaunchedEffect(Unit) {
+                        // Dhizuku mode is checked inside that function
+                        vm.getFrpState()
                     }
-                }
-                val timeText = if (time != 0) " (${time}s)" else ""
-                TextButton(
-                    {
-                        vm.deactivate()
-                        dialog = 0
-                        onDeactivate()
-                    },
-                    enabled = time == 0,
-                    colors = ButtonDefaults.textButtonColors(contentColor = colorScheme.error)
-                ) {
-                    Text(stringResource(R.string.confirm) + timeText)
-                }
-            },
-            dismissButton = {
-                CancelTextButton { dialog = 0 }
-            },
-            onDismissRequest = { dialog = 0 }
-        )
+                    val noticeText =
+                        if (frpNotice) ("\n" + stringResource(R.string.info_frp_policy_exists))
+                        else ""
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(stringResource(R.string.info_deactivate) + noticeText)
+                        Text(stringResource(R.string.enter_confirm_to_deactivate))
+                        OutlinedTextField(
+                            confirmation, { confirmation = it },
+                            Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            textStyle = typography.bodyLarge
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        {
+                            vm.deactivate()
+                            dialog = 0
+                            onDeactivate()
+                        },
+                        enabled = confirmation == "CONFIRM",
+                        colors = ButtonDefaults.textButtonColors(contentColor = colorScheme.error)
+                    ) {
+                        Text(stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    CancelTextButton { dialog = 0 }
+                },
+                onDismissRequest = { dialog = 0 }
+            )
+        }
         if (dialog == 5) AlertDialog(
             text = {
                 SelectionContainer {
@@ -339,7 +365,7 @@ fun WorkModesScreen(
                 Column {
                     Button({
                         dialog = 2
-                        vm.activateOrgProfileByShizuku { dialog = 0 }
+                        vm.activateOrgProfileByShizuku(::handleResult)
                     }) {
                         Text(stringResource(R.string.shizuku))
                     }

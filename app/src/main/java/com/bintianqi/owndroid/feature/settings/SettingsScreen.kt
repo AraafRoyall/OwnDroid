@@ -31,10 +31,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -379,6 +379,7 @@ fun AppLockSettingsScreen(
     var showSecret by rememberSaveable { mutableStateOf(false) }
     var generatedSecret by rememberSaveable { mutableStateOf("") }
     var showRemoveConfirm by rememberSaveable { mutableStateOf(false) }
+    var showDisableConfirm by rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(
         password, { password = it }, Modifier
             .fillMaxWidth()
@@ -412,7 +413,7 @@ fun AppLockSettingsScreen(
             .padding(vertical = 6.dp),
         Arrangement.SpaceBetween, Alignment.CenterVertically
     ) {
-        Text(stringResource(R.string.allow_biometrics))
+        Text(stringResource(R.string.allow_biometric_unlock))
         Switch(allowBiometrics, { allowBiometrics = it })
     }
     Row(
@@ -467,25 +468,51 @@ fun AppLockSettingsScreen(
             }
         }
     }
-    Button(
-        {
-            vm.setAppLockConfig(password, allowBiometrics, lockWhenLeaving, allowTotp)
-            onNavigateUp()
-        },
-        Modifier.fillMaxWidth(),
-        isInputLegal && confirmPassword == password
-    ) {
-        Text(stringResource(if (alreadySet) R.string.update else R.string.set))
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Button(
+            {
+                vm.setAppLockConfig(password, allowBiometrics, lockWhenLeaving, allowTotp)
+                onNavigateUp()
+            },
+            if (alreadySet) Modifier.weight(1f) else Modifier.fillMaxWidth(),
+            isInputLegal && confirmPassword == password
+        ) {
+            Text(stringResource(if (alreadySet) R.string.update else R.string.set))
+        }
+        if (alreadySet) {
+            Button(
+                { showDisableConfirm = true },
+                Modifier.weight(1f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error,
+                    contentColor = MaterialTheme.colorScheme.onError
+                )
+            ) {
+                Text(stringResource(R.string.disable))
+            }
+        }
     }
     if (alreadySet && !hideDestructiveOptions) FilledTonalButton(
         {
             vm.disableAppLock()
             onNavigateUp()
+    if (showDisableConfirm) AlertDialog(
+        onDismissRequest = { showDisableConfirm = false },
+        title = { Text(stringResource(R.string.disable_app_lock_confirmation_title)) },
+        text = { Text(stringResource(R.string.disable_app_lock_confirmation_message)) },
+        confirmButton = {
+            TextButton({
+                showDisableConfirm = false
+                vm.disableAppLock()
+                onNavigateUp()
+            }) {
+                Text(stringResource(R.string.disable), color = MaterialTheme.colorScheme.error)
+            }
         },
-        Modifier.fillMaxWidth()
-    ) {
-        Text(stringResource(R.string.disable))
-    }
+        dismissButton = {
+            CancelTextButton { showDisableConfirm = false }
+        }
+    )
     if (showSecret && generatedSecret.isNotEmpty()) {
         // otpauth URI is ASCII; byte-mode QR via ISO-8859-1 roundtrips it exactly
         val totpQr = remember(generatedSecret) {

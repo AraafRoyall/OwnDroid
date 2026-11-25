@@ -113,6 +113,7 @@ class SettingsViewModel(
             it.appLock.lockWhenLeaving = lockWhenLeaving
             it.appLock.totp = totp
         }
+        if (password.isNotEmpty()) toastChannel.sendText(R.string.password_set_success)
     }
 
     fun disableAppLock() {
