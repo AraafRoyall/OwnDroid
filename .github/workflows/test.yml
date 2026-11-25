@@ -1,0 +1,50 @@
+name: Cherry-pick hide destructive options
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cherry-pick-hide-destructive
+  cancel-in-progress: false
+
+jobs:
+  cherry-pick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: hide-Destructive
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Cherry-pick feature commit
+        shell: bash
+        env:
+          SOURCE_COMMIT: d482eb9276c16fd0c8af9a72b997637d855d7783
+        run: |
+          set -euo pipefail
+
+          git fetch origin dev
+
+          if git log --format=%B | grep -Fq "(cherry picked from commit ${SOURCE_COMMIT})"; then
+            echo "This feature commit has already been cherry-picked."
+            exit 0
+          fi
+
+          git cat-file -e "${SOURCE_COMMIT}^{commit}"
+
+          if ! git cherry-pick -x "${SOURCE_COMMIT}"; then
+            git cherry-pick --abort || true
+            echo "::error::Cherry-pick failed because of conflicts. Resolve them manually and rerun."
+            exit 1
+          fi
+
+          git push origin HEAD:refs/heads/hide-Destructive
