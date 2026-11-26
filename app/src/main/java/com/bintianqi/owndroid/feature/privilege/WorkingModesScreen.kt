@@ -77,6 +77,7 @@ fun WorkModesScreen(
     // 0: none, 1: device owner, 2: circular progress indicator, 3: result, 4: deactivate
     // 5: command, 6: org profile, 7: org profile command
     var dialog by rememberSaveable { mutableIntStateOf(0) }
+    var confirmation by rememberSaveable { mutableStateOf("") }
     var operationSucceed by rememberSaveable { mutableStateOf(false) }
     var resultText by rememberSaveable { mutableStateOf("") }
     LaunchedEffect(Unit) {
@@ -121,6 +122,7 @@ fun WorkModesScreen(
                                 { Text(stringResource(R.string.deactivate)) },
                                 {
                                     expanded = false
+                                    confirmation = ""
                                     dialog = 4
                                 },
                                 leadingIcon = { Icon(Icons.Default.Close, null) }
@@ -289,8 +291,6 @@ fun WorkModesScreen(
             onDismissRequest = {}
         )
         if (dialog == 4 && !hideDestructiveOptions) AlertDialog(
-            var confirmation by rememberSaveable { mutableStateOf("") }
-            AlertDialog(
                 title = { Text(stringResource(R.string.deactivate)) },
                 text = {
                     val frpNotice by vm.frpNoticeState.collectAsState()
@@ -330,7 +330,6 @@ fun WorkModesScreen(
                 },
                 onDismissRequest = { dialog = 0 }
             )
-        }
         if (dialog == 5) AlertDialog(
             text = {
                 SelectionContainer {
