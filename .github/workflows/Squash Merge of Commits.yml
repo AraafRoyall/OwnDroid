@@ -1,0 +1,141 @@
+
+name: Squash Commits
+
+on:
+  workflow_dispatch:
+    inputs:
+      from_hash:
+        description: First commit hash (inclusive)
+        required: true
+        type: string
+
+      auto_to_head:
+        description: Auto-detect last commit (HEAD)
+        required: true
+        default: false
+        type: boolean
+
+      to_hash:
+        description: Last commit hash (ignored when auto-detect is enabled)
+        required: false
+        type: string
+
+      commit_message:
+        description: New squash commit message (optional)
+        required: false
+        type: string
+
+concurrency:
+  group: squash-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  squash:
+    name: Squash Commit Range
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Selected Branch
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+
+      - name: Squash and Push
+        env:
+          BRANCH: ${{ github.ref_name }}
+          FROM_HASH: ${{ inputs.from_hash }}
+          AUTO_TO_HEAD: ${{ inputs.auto_to_head }}
+          TO_HASH: ${{ inputs.to_hash }}
+          COMMIT_MESSAGE: ${{ inputs.commit_message }}
+        run: |
+          set -euo pipefail
+
+          # Validate branch
+          [[ "$GITHUB_REF" == refs/heads/* ]]
+          git check-ref-format --branch "$BRANCH" >/dev/null
+
+          # Validate From hash
+          [[ "$FROM_HASH" =~ ^[0-9a-fA-F]{7,64}$ ]]
+
+          # Fetch and update remote tracking branch
+          REMOTE_REF="refs/remotes/origin/$BRANCH"
+          git fetch --no-tags origin \
+            "+refs/heads/$BRANCH:$REMOTE_REF"
+
+          REMOTE_BEFORE=$(git rev-parse "$REMOTE_REF")
+
+          # Checkout latest branch
+          git switch -C "$BRANCH" "$REMOTE_REF"
+
+          # Resolve From commit
+          FROM=$(git rev-parse --verify "${FROM_HASH}^{commit}")
+
+          # Resolve To commit
+          if [ "$AUTO_TO_HEAD" = "true" ]; then
+            echo "Auto-detecting latest commit..."
+            TO=$(git rev-parse HEAD)
+          else
+            [[ "$TO_HASH" =~ ^[0-9a-fA-F]{7,64}$ ]]
+            TO=$(git rev-parse --verify "${TO_HASH}^{commit}")
+          fi
+
+          # Validate range
+          BASE=$(git rev-parse --verify "${FROM}^")
+
+          git merge-base --is-ancestor "$FROM" "$TO"
+          git merge-base --is-ancestor "$TO" HEAD
+
+          COUNT=$(git rev-list --count "$BASE..$TO")
+          test "$COUNT" -ge 2
+
+          echo "Branch: $BRANCH"
+          echo "From: $FROM"
+          echo "To: $TO"
+          echo "Commits to squash: $COUNT"
+
+          # Reject merge commits in rewritten history
+          MERGES=$(git rev-list --merges "$BASE..HEAD")
+
+          if [ -n "$MERGES" ]; then
+            echo "Error: Merge commits found in rewrite range."
+            exit 1
+          fi
+
+          # Configure Git identity
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Create squash commit
+          TREE=$(git rev-parse "$TO^{tree}")
+
+          MESSAGE="$COMMIT_MESSAGE"
+          if [ -z "$MESSAGE" ]; then
+            MESSAGE="Squash commits ${FROM:0:7}..${TO:0:7}"
+          fi
+
+          SQUASH_COMMIT=$(
+            printf '%s\n' "$MESSAGE" |
+            git commit-tree "$TREE" -p "$BASE"
+          )
+
+          echo "New squash commit: $SQUASH_COMMIT"
+
+          # Preserve commits after To
+          if [ "$TO" = "$(git rev-parse HEAD)" ]; then
+            git reset --hard "$SQUASH_COMMIT"
+          else
+            git rebase --onto "$SQUASH_COMMIT" "$TO" "$BRANCH"
+          fi
+
+          # Push with correct remote reference and race protection
+          git push \
+            --force-with-lease="refs/heads/$BRANCH:$REMOTE_BEFORE" \
+            origin "HEAD:refs/heads/$BRANCH"
+
+          echo "Successfully squashed $COUNT commits."
+          echo "Branch: $BRANCH"
+          echo "New HEAD: $(git rev-parse HEAD)"
