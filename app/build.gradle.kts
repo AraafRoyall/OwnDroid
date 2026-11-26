@@ -10,7 +10,7 @@ android {
     signingConfigs {
     create("defaultSignature") {
         storeFile = file(project.findProperty("StoreFile") ?: "testkey.jks")
-        storeType = project.findProperty("StoreType") as String?
+        storeType = (project.findProperty("StoreType") as String?) ?: "JKS"
         storePassword = (project.findProperty("StorePassword") as String?) ?: "testkey"
         keyPassword = (project.findProperty("KeyPassword") as String?) ?: "testkey"
         keyAlias = (project.findProperty("KeyAlias") as String?) ?: "testkey"
