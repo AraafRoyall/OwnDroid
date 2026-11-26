@@ -3,16 +3,10 @@ name: CI build
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["dev"]
-    paths-ignore:
-      - "**.md"
-    tags-ignore:
-      - "**"
 
 concurrency:
   group: main
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 permissions:
   contents: write
