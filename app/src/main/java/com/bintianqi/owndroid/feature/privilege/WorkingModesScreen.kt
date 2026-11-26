@@ -289,24 +289,6 @@ fun WorkModesScreen(
             onDismissRequest = {}
         )
         if (dialog == 4 && !hideDestructiveOptions) AlertDialog(
-            title = { Text(stringResource(R.string.deactivate)) },
-            text = {
-                val frpNotice by vm.frpNoticeState.collectAsState()
-                LaunchedEffect(Unit) {
-                    // Dhizuku mode is checked inside that function
-                    vm.getFrpState()
-                }
-                val noticeText =
-                    if (frpNotice) ("" + stringResource(R.string.info_frp_policy_exists)) else ""
-                Text(stringResource(R.string.info_deactivate) + noticeText)
-            },
-            confirmButton = {
-                var time by remember { mutableIntStateOf(if (privilege.dhizuku) 0 else 3) }
-                if (!privilege.dhizuku) LaunchedEffect(Unit) {
-                    for (i in (0..2).reversed()) {
-                        delay(1000)
-                        time = i
-        if (dialog == 4) {
             var confirmation by rememberSaveable { mutableStateOf("") }
             AlertDialog(
                 title = { Text(stringResource(R.string.deactivate)) },
