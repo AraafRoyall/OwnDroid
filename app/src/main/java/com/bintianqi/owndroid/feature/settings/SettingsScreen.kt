@@ -474,12 +474,12 @@ fun AppLockSettingsScreen(
                 vm.setAppLockConfig(password, allowBiometrics, lockWhenLeaving, allowTotp)
                 onNavigateUp()
             },
-            if (alreadySet) Modifier.weight(1f) else Modifier.fillMaxWidth(),
+            if (alreadySet && !hideDestructiveOptions) Modifier.weight(1f) else Modifier.fillMaxWidth(),
             isInputLegal && confirmPassword == password
         ) {
             Text(stringResource(if (alreadySet) R.string.update else R.string.set))
         }
-        if (alreadySet) {
+        if (alreadySet && !hideDestructiveOptions) {
             Button(
                 { showDisableConfirm = true },
                 Modifier.weight(1f),
@@ -492,11 +492,7 @@ fun AppLockSettingsScreen(
             }
         }
     }
-    if (alreadySet && !hideDestructiveOptions) FilledTonalButton(
-        {
-            vm.disableAppLock()
-            onNavigateUp()
-    if (showDisableConfirm) AlertDialog(
+    if (showDisableConfirm && !hideDestructiveOptions) AlertDialog(
         onDismissRequest = { showDisableConfirm = false },
         title = { Text(stringResource(R.string.disable_app_lock_confirmation_title)) },
         text = { Text(stringResource(R.string.disable_app_lock_confirmation_message)) },
