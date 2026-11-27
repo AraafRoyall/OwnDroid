@@ -9,13 +9,18 @@ data class DynamicIntentFilterOptions(
     val actions: List<String>,
     val categories: List<String> = emptyList(),
     val mimeTypes: List<String> = emptyList(),
-    val direction: Int = 3
+    val direction: Int = 3,
+    val includeNoMime: Boolean = false
 ) {
-    fun normalized() = copy(
-        actions = actions.map { it.trim() }.filter { it.isNotEmpty() }.distinct(),
-        categories = categories.map { it.trim() }.filter { it.isNotEmpty() }.distinct(),
-        mimeTypes = mimeTypes.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
-    )
+    fun normalized(): DynamicIntentFilterOptions {
+        val normalizedMimeTypes = mimeTypes.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
+        return copy(
+            actions = actions.map { it.trim() }.filter { it.isNotEmpty() }.distinct(),
+            categories = categories.map { it.trim() }.filter { it.isNotEmpty() }.distinct(),
+            mimeTypes = normalizedMimeTypes,
+            includeNoMime = includeNoMime && normalizedMimeTypes.isNotEmpty()
+        )
+    }
 }
 
 class DynamicIntentFilterEntry(
