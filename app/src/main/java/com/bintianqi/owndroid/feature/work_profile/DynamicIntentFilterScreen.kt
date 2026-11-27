@@ -310,61 +310,60 @@ private fun DynamicStringListEditor(
             }
         }
         values.forEachIndexed { index, value ->
-                var expanded by remember(index) { mutableStateOf(false) }
-                val matchingSuggestions = remember(value, suggestions) {
-                    if (value.isBlank()) suggestions
-                    else suggestions.filter {
-                        it.name.contains(value, ignoreCase = true) ||
-                            it.value.contains(value, ignoreCase = true)
-                    }
+            var expanded by remember(index) { mutableStateOf(false) }
+            val matchingSuggestions = remember(value, suggestions) {
+                if (value.isBlank()) suggestions
+                else suggestions.filter {
+                    it.name.contains(value, ignoreCase = true) ||
+                        it.value.contains(value, ignoreCase = true)
                 }
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
-                    verticalAlignment = Alignment.CenterVertically
+            }
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ExposedDropdownMenuBox(
+                    expanded,
+                    { expanded = it },
+                    Modifier.weight(1F)
                 ) {
-                    ExposedDropdownMenuBox(
-                        expanded,
-                        { expanded = it },
-                        Modifier.weight(1F)
-                    ) {
-                        OutlinedTextField(
-                            value,
-                            {
-                                values[index] = it
-                                expanded = true
-                            },
-                            Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth(),
-                            label = { Text(fieldLabel) },
-                            singleLine = true,
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
-                            )
+                    OutlinedTextField(
+                        value,
+                        {
+                            values[index] = it
+                            expanded = true
+                        },
+                        Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth(),
+                        label = { Text(fieldLabel) },
+                        singleLine = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
                         )
-                        ExposedDropdownMenu(
-                            expanded && matchingSuggestions.isNotEmpty(),
-                            { expanded = false },
-                            modifier = Modifier.heightIn(max = 360.dp)
-                        ) {
-                            matchingSuggestions.forEach { suggestion ->
-                                DropdownMenuItem(
-                                    {
-                                        Column {
-                                            Text(suggestion.name, style = MaterialTheme.typography.titleSmall)
-                                            Text(suggestion.value, style = MaterialTheme.typography.bodySmall)
-                                        }
-                                    },
-                                    {
-                                        values[index] = suggestion.value
-                                        expanded = false
+                    )
+                    ExposedDropdownMenu(
+                        expanded && matchingSuggestions.isNotEmpty(),
+                        { expanded = false },
+                        modifier = Modifier.heightIn(max = 360.dp)
+                    ) {
+                        matchingSuggestions.forEach { suggestion ->
+                            DropdownMenuItem(
+                                {
+                                    Column {
+                                        Text(suggestion.name, style = MaterialTheme.typography.titleSmall)
+                                        Text(suggestion.value, style = MaterialTheme.typography.bodySmall)
                                     }
-                                )
-                            }
+                                },
+                                {
+                                    values[index] = suggestion.value
+                                    expanded = false
+                                }
+                            )
                         }
                     }
-                    IconButton({ values.removeAt(index) }) {
-                        Icon(Icons.Outlined.Delete, stringResource(R.string.remove))
-                    }
+                }
+                IconButton({ values.removeAt(index) }) {
+                    Icon(Icons.Outlined.Delete, stringResource(R.string.remove))
                 }
             }
         }
