@@ -114,6 +114,8 @@ import com.bintianqi.owndroid.feature.work_profile.AddCrossProfileIntentFilterSc
 import com.bintianqi.owndroid.feature.work_profile.CreateWorkProfileScreen
 import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterPresetsScreen
 import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterScreen
+import com.bintianqi.owndroid.feature.work_profile.DynamicIntentFilterScreen
+import com.bintianqi.owndroid.feature.work_profile.AddDynamicIntentFilterScreen
 import com.bintianqi.owndroid.feature.work_profile.DeleteWorkProfileScreen
 import com.bintianqi.owndroid.feature.work_profile.SuspendPersonalAppScreen
 import com.bintianqi.owndroid.feature.work_profile.WorkProfileScreen
@@ -398,6 +400,16 @@ fun myEntryProvider(
         metadata = navParentKey<Destination.CrossProfileIntentFilter>()
     ) {
         CrossProfileIntentFilterPresetsScreen(viewModel(), ::navigateUp)
+    }
+    myEntry<Destination.DynamicIntentFilter> {
+        DynamicIntentFilterScreen(
+            viewModel(factory = container.viewModelFactory), ::navigateUp, ::navigate
+        )
+    }
+    myEntry<Destination.AddDynamicIntentFilter>(
+        metadata = navParentKey<Destination.DynamicIntentFilter>()
+    ) {
+        AddDynamicIntentFilterScreen(it, viewModel(), ::navigateUp)
     }
     myEntry<Destination.DeleteWorkProfile>(
         metadata = navParentKey<Destination.WorkProfile>()

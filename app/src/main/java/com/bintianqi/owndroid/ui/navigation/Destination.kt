@@ -63,6 +63,8 @@ sealed class Destination : NavKey {
     @Serializable object CrossProfileIntentFilter : Destination()
     @Serializable class AddCrossProfileIntentFilter(val editingId: Int) : Destination()
     @Serializable object CrossProfileIntentFilterPresets: Destination()
+    @Serializable object DynamicIntentFilter : Destination()
+    @Serializable class AddDynamicIntentFilter(val editingId: Int) : Destination()
     @Serializable object DeleteWorkProfile : Destination()
 
     @Serializable object ApplicationFeatures : Destination()

@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.bintianqi.owndroid.feature.applications.AppGroupRepository
 
-class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 15) {
+class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 16) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(DHIZUKU_CLIENTS_TABLE)
         db.execSQL(SECURITY_LOGS_TABLE)
@@ -14,6 +14,7 @@ class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 15) 
         db.execSQL(APP_GROUPS_TABLE_V3)
         db.execSQL(APP_GROUP_APPS_TABLE)
         db.execSQL(CPIF2_TABLE)
+        db.execSQL(DYNAMIC_CPIF_TABLE)
         db.execSQL(TIME_BLOCK_RULES_TABLE)
         db.execSQL(TIME_BLOCK_SUSPENDED_TABLE)
         db.execSQL(TIME_BLOCK_USAGE_TABLE)
@@ -66,6 +67,9 @@ class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 15) 
         if (oldVersion < 15) {
             db.execSQL("ALTER TABLE app_groups ADD COLUMN position INTEGER")
         }
+        if (oldVersion < 16) {
+            db.execSQL(DYNAMIC_CPIF_TABLE)
+        }
     }
 
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -110,6 +114,9 @@ class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 15) 
         const val CPIF2_TABLE = "CREATE TABLE cpif2 (id INTEGER PRIMARY KEY," +
                 "action_str TEXT, category TEXT, mime_type TEXT, direction INTEGER," +
                 "created_at INTEGER, enabled INTEGER DEFAULT TRUE)"
+        const val DYNAMIC_CPIF_TABLE = "CREATE TABLE dynamic_cpif (id INTEGER PRIMARY KEY," +
+                "actions TEXT NOT NULL, categories TEXT NOT NULL, mime_types TEXT NOT NULL," +
+                "direction INTEGER NOT NULL, created_at INTEGER NOT NULL, enabled INTEGER DEFAULT TRUE)"
         const val TIME_BLOCK_RULES_TABLE = "CREATE TABLE time_block_rules (" +
                 "id INTEGER PRIMARY KEY," +
                 "package_name TEXT, daily_limit_minutes INTEGER," +

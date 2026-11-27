@@ -840,4 +840,11 @@
     <string name="enter_confirm_to_deactivate">Please enter "CONFIRM" to continue.</string>
     <string name="delete_app_group">Delete app group</string>
     <string name="delete_app_group_confirmation">Are you sure you want to delete the app group %1$s? This action cannot be undone.</string>
+    <string name="dynamic_intent_filters">Dynamic Intent Filters</string>
+    <string name="actions">Actions</string>
+    <string name="categories">Categories</string>
+    <string name="mime_types">MIME types</string>
+    <string name="dynamic_filter_no_items">No dynamic intent filters configured</string>
+    <string name="dynamic_filter_action_required">At least one action is required.</string>
+    <string name="dynamic_filter_mime_invalid">Enter valid MIME types, for example image/* or application/pdf.</string>
 </resources>
