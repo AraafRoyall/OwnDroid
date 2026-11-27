@@ -657,4 +657,6 @@
     <string name="dynamic_filter_no_mime">MIME türü yok</string>
     <string name="dynamic_filter_no_mime_description">MIME türü veya veri URI'si olmayan intentlerle eşleşir.</string>
     <string name="dynamic_filter_mime_required">En az bir MIME türü ekleyin veya MIME türü yok seçeneğini seçin.</string>
+    <string name="dynamic_filter_include_no_mime">MIME türü olmayan intentleri de eşleştir</string>
+    <string name="dynamic_filter_include_no_mime_description">MIME türü veya veri URI'si olmayan intentler için ikinci bir filtre ekler.</string>
 </resources>
