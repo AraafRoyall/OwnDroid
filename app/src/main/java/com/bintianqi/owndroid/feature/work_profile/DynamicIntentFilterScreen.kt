@@ -260,7 +260,7 @@ fun AddDynamicIntentFilterScreen(
                 color = MaterialTheme.colorScheme.error
             )
         }
-old MIME required message        Button(
+        Button(
             {
                 val options = DynamicIntentFilterOptions(
                     cleanActions, cleanCategories, cleanMimeTypes, direction,
