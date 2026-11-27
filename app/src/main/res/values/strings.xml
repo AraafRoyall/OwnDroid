@@ -847,4 +847,7 @@
     <string name="dynamic_filter_no_items">No dynamic intent filters configured</string>
     <string name="dynamic_filter_action_required">At least one action is required.</string>
     <string name="dynamic_filter_mime_invalid">Enter valid MIME types, for example image/* or application/pdf.</string>
+    <string name="dynamic_filter_no_mime">No MIME type</string>
+    <string name="dynamic_filter_no_mime_description">Matches intents without a MIME type or data URI.</string>
+    <string name="dynamic_filter_mime_required">Add at least one MIME type, or select No MIME type.</string>
 </resources>
