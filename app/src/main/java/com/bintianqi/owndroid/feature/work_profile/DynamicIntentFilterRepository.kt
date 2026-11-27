@@ -14,6 +14,8 @@ class DynamicIntentFilterRepository(private val dbHelper: MyDbHelper) {
             put("categories", Json.encodeToString(options.categories))
             put("mime_types", Json.encodeToString(options.mimeTypes))
             put("direction", options.direction)
+            put("include_no_mime", if (options.includeNoMime) 1 else 0)
+            put("include_no_mime", if (options.includeNoMime) 1 else 0)
             put("created_at", System.currentTimeMillis())
             put("enabled", if (enabled) 1 else 0)
         }
@@ -40,7 +42,7 @@ class DynamicIntentFilterRepository(private val dbHelper: MyDbHelper) {
     fun getAllFilters(): List<DynamicIntentFilterEntry> {
         val result = mutableListOf<DynamicIntentFilterEntry>()
         dbHelper.readableDatabase.rawQuery(
-            "SELECT id, actions, categories, mime_types, direction, created_at, enabled FROM dynamic_cpif ORDER BY created_at DESC",
+            "SELECT id, actions, categories, mime_types, direction, include_no_mime, created_at, enabled FROM dynamic_cpif ORDER BY created_at DESC",
             null
         ).use { cursor ->
             while (cursor.moveToNext()) {
@@ -48,10 +50,11 @@ class DynamicIntentFilterRepository(private val dbHelper: MyDbHelper) {
                     Json.decodeFromString<List<String>>(cursor.getString(1)),
                     Json.decodeFromString<List<String>>(cursor.getString(2)),
                     Json.decodeFromString<List<String>>(cursor.getString(3)),
-                    cursor.getInt(4)
+                    cursor.getInt(4),
+                    cursor.getInt(5) == 1
                 )
                 result += DynamicIntentFilterEntry(
-                    cursor.getInt(0), options, cursor.getLong(5), cursor.getInt(6) == 1
+                    cursor.getInt(0), options, cursor.getLong(6), cursor.getInt(7) == 1
                 )
             }
         }
