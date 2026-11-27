@@ -81,7 +81,7 @@ jobs:
         with:
           token: ${{ github.token }}
           tag_name: dynamic-intent-filters-${{ github.run_number }}
-          name: Dynamic Intent Filters Build #${{ github.run_number }}
+          name: "Dynamic Intent Filters Build #${{ github.run_number }}"
           target_commitish: ${{ github.sha }}
           draft: false
           prerelease: true
