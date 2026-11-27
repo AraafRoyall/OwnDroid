@@ -850,4 +850,6 @@
     <string name="dynamic_filter_no_mime">No MIME type</string>
     <string name="dynamic_filter_no_mime_description">Matches intents without a MIME type or data URI.</string>
     <string name="dynamic_filter_mime_required">Add at least one MIME type, or select No MIME type.</string>
+    <string name="dynamic_filter_include_no_mime">Also match intents without MIME type</string>
+    <string name="dynamic_filter_include_no_mime_description">Adds a second filter for intents without a MIME type or data URI.</string>
 </resources>
