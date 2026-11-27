@@ -803,4 +803,7 @@
     <string name="enter_confirm_to_deactivate">输入“CONFIRM”以继续。</string>
     <string name="delete_app_group">删除应用组</string>
     <string name="delete_app_group_confirmation">确定要删除应用组 %1$s 吗？此操作无法撤销。</string>
+    <string name="dynamic_filter_no_mime">无 MIME 类型</string>
+    <string name="dynamic_filter_no_mime_description">匹配不带 MIME 类型或数据 URI 的 Intent。</string>
+    <string name="dynamic_filter_mime_required">请至少添加一种 MIME 类型，或选择“无 MIME 类型”。</string>
 </resources>
