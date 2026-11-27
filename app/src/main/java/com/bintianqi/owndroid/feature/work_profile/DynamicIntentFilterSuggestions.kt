@@ -31,8 +31,6 @@ internal object DynamicIntentSuggestionCatalog {
         DynamicIntentSuggestion("ACTION_DIAL", Intent.ACTION_DIAL),
         DynamicIntentSuggestion("ACTION_CALL", Intent.ACTION_CALL),
         DynamicIntentSuggestion("ACTION_CALL_BUTTON", Intent.ACTION_CALL_BUTTON),
-        DynamicIntentSuggestion("ACTION_CALL_EMERGENCY", Intent.ACTION_CALL_EMERGENCY),
-        DynamicIntentSuggestion("ACTION_CALL_PRIVILEGED", Intent.ACTION_CALL_PRIVILEGED),
         DynamicIntentSuggestion("ACTION_MAIN", Intent.ACTION_MAIN),
         DynamicIntentSuggestion("ACTION_IMAGE_CAPTURE", MediaStore.ACTION_IMAGE_CAPTURE),
         DynamicIntentSuggestion("ACTION_VIDEO_CAPTURE", MediaStore.ACTION_VIDEO_CAPTURE),
