@@ -110,10 +110,10 @@ import com.bintianqi.owndroid.feature.users.UserOperationScreen
 import com.bintianqi.owndroid.feature.users.UserSessionMessageScreen
 import com.bintianqi.owndroid.feature.users.UsersOptionsScreen
 import com.bintianqi.owndroid.feature.users.UsersScreen
-import com.bintianqi.owndroid.feature.work_profile.AddCrossProfileIntentFilterScreen
 import com.bintianqi.owndroid.feature.work_profile.CreateWorkProfileScreen
-import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterPresetsScreen
-import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterScreen
+import com.bintianqi.owndroid.feature.work_profile.DynamicIntentFilterScreen
+import com.bintianqi.owndroid.feature.work_profile.DynamicIntentFilterPresetsScreen
+import com.bintianqi.owndroid.feature.work_profile.AddDynamicIntentFilterScreen
 import com.bintianqi.owndroid.feature.work_profile.DeleteWorkProfileScreen
 import com.bintianqi.owndroid.feature.work_profile.SuspendPersonalAppScreen
 import com.bintianqi.owndroid.feature.work_profile.WorkProfileScreen
@@ -384,20 +384,20 @@ fun myEntryProvider(
             viewModel(), ::navigateUp
         )
     }
-    myEntry<Destination.CrossProfileIntentFilter> {
-        CrossProfileIntentFilterScreen(
+    myEntry<Destination.DynamicIntentFilter> {
+        DynamicIntentFilterScreen(
             viewModel(factory = container.viewModelFactory), ::navigateUp, ::navigate
         )
     }
-    myEntry<Destination.AddCrossProfileIntentFilter>(
-        metadata = navParentKey<Destination.CrossProfileIntentFilter>()
+    myEntry<Destination.AddDynamicIntentFilter>(
+        metadata = navParentKey<Destination.DynamicIntentFilter>()
     ) {
-        AddCrossProfileIntentFilterScreen(it, viewModel(), ::navigateUp)
+        AddDynamicIntentFilterScreen(it, viewModel(), ::navigateUp)
     }
-    myEntry<Destination.CrossProfileIntentFilterPresets>(
-        metadata = navParentKey<Destination.CrossProfileIntentFilter>()
+    myEntry<Destination.DynamicIntentFilterPresets>(
+        metadata = navParentKey<Destination.DynamicIntentFilter>()
     ) {
-        CrossProfileIntentFilterPresetsScreen(viewModel(), ::navigateUp)
+        DynamicIntentFilterPresetsScreen(viewModel(), ::navigateUp)
     }
     myEntry<Destination.DeleteWorkProfile>(
         metadata = navParentKey<Destination.WorkProfile>()
