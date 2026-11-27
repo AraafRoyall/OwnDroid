@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
@@ -215,9 +216,9 @@ fun AddDynamicIntentFilterScreen(
     val canSave = cleanActions.isNotEmpty() && !invalidMime && entryLoaded
 
     MyScaffold(if (params.editingId == -1) R.string.add_filter else R.string.edit, navigateUp) {
-        DynamicStringListEditor(R.string.actions, actions, "Action")
-        DynamicStringListEditor(R.string.categories, categories, "Category")
-        DynamicStringListEditor(R.string.mime_types, mimeTypes, "MIME type")
+        DynamicStringListEditor(R.string.actions, actions, "Action", DynamicIntentSuggestionCatalog.actions)
+        DynamicStringListEditor(R.string.categories, categories, "Category", DynamicIntentSuggestionCatalog.categories)
+        DynamicStringListEditor(R.string.mime_types, mimeTypes, "MIME type", DynamicIntentSuggestionCatalog.mimeTypes)
         DynamicDirectionSelector(direction, { direction = it })
 
         if (cleanActions.isEmpty()) {
@@ -260,11 +261,13 @@ fun AddDynamicIntentFilterScreen(
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun DynamicStringListEditor(
     titleId: Int,
     values: SnapshotStateList<String>,
-    fieldLabel: String
+    fieldLabel: String,
+    suggestions: List<DynamicIntentSuggestion>
 ) {
     Column(Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding, vertical = 6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -276,16 +279,55 @@ private fun DynamicStringListEditor(
             }
         }
         values.forEachIndexed { index, value ->
+            var expanded by remember(index) { mutableStateOf(false) }
+            val matchingSuggestions = remember(value, suggestions) {
+                if (value.isBlank()) suggestions
+                else suggestions.filter {
+                    it.name.contains(value, ignoreCase = true) ||
+                        it.value.contains(value, ignoreCase = true)
+                }
+            }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value, { values[index] = it },
-                    Modifier.weight(1F),
-                    label = { Text(fieldLabel) },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
+                ExposedDropdownMenuBox(
+                    expanded,
+                    { expanded = it },
+                    Modifier.weight(1F)
+                ) {
+                    OutlinedTextField(
+                        value,
+                        {
+                            values[index] = it
+                            expanded = true
+                        },
+                        Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth(),
+                        label = { Text(fieldLabel) },
+                        singleLine = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
+                        )
                     )
-                )
+                    ExposedDropdownMenu(
+                        expanded && matchingSuggestions.isNotEmpty(),
+                        { expanded = false },
+                        modifier = Modifier.heightIn(max = 360.dp)
+                    ) {
+                        matchingSuggestions.forEach { suggestion ->
+                            DropdownMenuItem(
+                                {
+                                    Column {
+                                        Text(suggestion.name, style = MaterialTheme.typography.titleSmall)
+                                        Text(suggestion.value, style = MaterialTheme.typography.bodySmall)
+                                    }
+                                },
+                                {
+                                    values[index] = suggestion.value
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
                 IconButton({ values.removeAt(index) }) {
                     Icon(Icons.Outlined.Delete, stringResource(R.string.remove))
                 }
