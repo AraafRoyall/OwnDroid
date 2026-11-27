@@ -45,9 +45,9 @@ class DynamicIntentFilterRepository(private val dbHelper: MyDbHelper) {
         ).use { cursor ->
             while (cursor.moveToNext()) {
                 val options = DynamicIntentFilterOptions(
-                    Json.decodeFromString(cursor.getString(1)),
-                    Json.decodeFromString(cursor.getString(2)),
-                    Json.decodeFromString(cursor.getString(3)),
+                    Json.decodeFromString<List<String>>(cursor.getString(1)),
+                    Json.decodeFromString<List<String>>(cursor.getString(2)),
+                    Json.decodeFromString<List<String>>(cursor.getString(3)),
                     cursor.getInt(4)
                 )
                 result += DynamicIntentFilterEntry(

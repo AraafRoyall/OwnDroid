@@ -117,7 +117,7 @@ class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 17) 
         const val CPIF2_TABLE = "CREATE TABLE cpif2 (id INTEGER PRIMARY KEY, action_str TEXT, category TEXT, mime_type TEXT, direction INTEGER, created_at INTEGER, enabled INTEGER DEFAULT TRUE)"
         const val DYNAMIC_CPIF_TABLE = "CREATE TABLE IF NOT EXISTS dynamic_cpif (id INTEGER PRIMARY KEY, actions TEXT NOT NULL, categories TEXT NOT NULL, mime_types TEXT NOT NULL, direction INTEGER NOT NULL, created_at INTEGER NOT NULL, enabled INTEGER DEFAULT TRUE)"
         const val APP_MIGRATIONS_TABLE = "CREATE TABLE IF NOT EXISTS app_migrations (name TEXT PRIMARY KEY, created_at INTEGER NOT NULL)"
-        const val TIME_BLOCK_RULES_TABLE = "CREATE TABLE time_block_rules (package_name TEXT, daily_limit_minutes INTEGER, blocked_windows TEXT, allowed_windows TEXT, enabled INTEGER)"
+        const val TIME_BLOCK_RULES_TABLE = "CREATE TABLE time_block_rules (id INTEGER PRIMARY KEY, package_name TEXT, daily_limit_minutes INTEGER, blocked_windows TEXT, allowed_windows TEXT, enabled INTEGER)"
         const val TIME_BLOCK_SUSPENDED_TABLE = "CREATE TABLE time_block_suspended (package_name TEXT PRIMARY KEY)"
         const val TIME_BLOCK_USAGE_TABLE = "CREATE TABLE time_block_usage (package_name TEXT PRIMARY KEY, used_ms INTEGER, day_epoch INTEGER)"
     }

@@ -125,7 +125,7 @@ class MyViewModelFactory(
         if (checkType(WorkProfileViewModel::class)) {
             return WorkProfileViewModel(ph, ps, tc, sr) as T
         }
-                if (checkType(DynamicIntentFilterViewModel::class)) {
+        if (checkType(DynamicIntentFilterViewModel::class)) {
             return DynamicIntentFilterViewModel(app, ph, dynamicCpifRepo, tc, sr) as T
         }
 
