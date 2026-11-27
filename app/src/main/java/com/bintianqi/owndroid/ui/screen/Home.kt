@@ -45,7 +45,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                { Text(stringResource(R.string.app_name)) },
+                { Text(stringResource(R.string.app_name), maxLines = 1) },
                 actions = {
                     IconButton({ onNavigate(Destination.WorkingModes(true)) }) {
                         Icon(

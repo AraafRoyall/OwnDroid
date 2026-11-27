@@ -299,7 +299,7 @@ fun MyScaffold(
     Scaffold(
         topBar = {
             TopAppBar(
-                { Text(stringResource(title)) },
+                { Text(stringResource(title), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
                 actions = actions
             )
@@ -330,7 +330,7 @@ fun MyLazyScaffold(
     Scaffold(
         topBar = {
             TopAppBar(
-                { Text(stringResource(title)) },
+                { Text(stringResource(title), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
                 actions = actions
             )
