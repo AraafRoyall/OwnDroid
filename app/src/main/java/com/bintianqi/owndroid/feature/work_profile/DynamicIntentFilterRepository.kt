@@ -42,7 +42,7 @@ class DynamicIntentFilterRepository(private val dbHelper: MyDbHelper) {
     fun getAllFilters(): List<DynamicIntentFilterEntry> {
         val result = mutableListOf<DynamicIntentFilterEntry>()
         dbHelper.readableDatabase.rawQuery(
-            "SELECT id, actions, categories, mime_types, direction, created_at, enabled FROM dynamic_cpif ORDER BY created_at DESC",
+            "SELECT id, actions, categories, mime_types, direction, include_no_mime, created_at, enabled FROM dynamic_cpif ORDER BY created_at DESC",
             null
         ).use { cursor ->
             while (cursor.moveToNext()) {
