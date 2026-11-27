@@ -34,42 +34,16 @@ jobs:
           java-version: "21"
           cache: gradle
 
-      - name: Build signed release APK
-        env:
-          KEY_BASE64: ${{ secrets.KEY_BASE64 }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      - name: Build signed release APK (testkey.jks)
         run: |
           set -euo pipefail
 
-          test -n "$KEY_BASE64" || {
-            echo "::error::Repository secret KEY_BASE64 is missing."
-            exit 1
-          }
-          test -n "$KEY_PASSWORD" || {
-            echo "::error::Repository secret KEY_PASSWORD is missing."
+          test -s app/testkey.jks || {
+            echo "::error::app/testkey.jks is missing."
             exit 1
           }
 
-          printf '%s' "$KEY_BASE64" | base64 --decode > app/release.p12
-          trap 'rm -f app/release.p12' EXIT
-
-          ALIAS=$(keytool -list -v \
-            -storetype PKCS12 \
-            -keystore app/release.p12 \
-            -storepass "$KEY_PASSWORD" |
-            sed -n 's/^Alias name: //p' | head -n 1)
-
-          test -n "$ALIAS" || {
-            echo "::error::Could not detect the PKCS12 certificate alias."
-            exit 1
-          }
-
-          ./gradlew --no-daemon clean assembleRelease \
-            -PStoreFile="$GITHUB_WORKSPACE/app/release.p12" \
-            -PStoreType=PKCS12 \
-            -PStorePassword="$KEY_PASSWORD" \
-            -PKeyPassword="$KEY_PASSWORD" \
-            -PKeyAlias="$ALIAS"
+          ./gradlew --no-daemon clean assembleRelease
 
           APK="app/build/outputs/apk/release/app-release.apk"
           test -s "$APK"
