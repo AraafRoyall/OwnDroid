@@ -56,7 +56,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -300,7 +299,7 @@ fun MyScaffold(
     Scaffold(
         topBar = {
             TopAppBar(
-                { Text(stringResource(title), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                { Text(stringResource(title)) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
                 actions = actions
             )
@@ -331,7 +330,7 @@ fun MyLazyScaffold(
     Scaffold(
         topBar = {
             TopAppBar(
-                { Text(stringResource(title), maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                { Text(stringResource(title)) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
                 actions = actions
             )
@@ -359,7 +358,7 @@ fun MySmallTitleScaffold(
     Scaffold(
         topBar = {
             TopAppBar(
-                { Text(stringResource(title), overflow = TextOverflow.Ellipsis, maxLines = 1) },
+                { Text(stringResource(title)) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
                 actions = actions
             )
