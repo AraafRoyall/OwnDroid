@@ -1,6 +1,5 @@
 package com.bintianqi.owndroid.feature.work_profile
 
-import android.content.IntentFilter
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +15,8 @@ import kotlinx.serialization.json.Json
 
 class CrossProfileIntentFilterViewModel(
     val application: MyApplication, val ph: PrivilegeHelper,
-    val repo: CrossProfileIntentFilterRepository, val toastChannel: ToastChannel,
+    val repo: CrossProfileIntentFilterRepository, val dynamicRepo: DynamicIntentFilterRepository,
+    val toastChannel: ToastChannel,
     val sr: SettingsRepository
 ) : ViewModel() {
     val filterListState = MutableStateFlow(emptyList<IntentFilterEntry>())
@@ -85,18 +85,20 @@ class CrossProfileIntentFilterViewModel(
 
     fun applyFilters() {
         viewModelScope.launch(Dispatchers.IO) {
-            ph.safeDpmCall {
-                dpm.clearCrossProfileIntentFilters(dar)
-                filterListState.value.forEach {
-                    if (!it.enabled) return@forEach
-                    val filter = IntentFilter(it.options.action)
-                    if (it.options.category.isNotEmpty()) filter.addCategory(it.options.category)
-                    if (it.options.mimeType.isNotEmpty()) filter.addDataType(it.options.mimeType)
-                    dpm.addCrossProfileIntentFilter(dar, filter, it.options.direction)
+            try {
+                var applied = false
+                ph.safeDpmCall {
+                    CrossProfileIntentFilterApplier.apply(
+                        dpm, dar, repo.getAllFilters(), dynamicRepo.getAllFilters()
+                    )
+                    applied = true
                 }
+                if (applied) setFilterChanged(false)
+                toastChannel.sendStatus(applied)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                toastChannel.sendStatus(false)
             }
-            setFilterChanged(false)
-            toastChannel.sendStatus(true)
         }
     }
 
