@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
@@ -140,12 +141,12 @@ fun DynamicIntentFilterScreen(
                                 Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        if (entry.options.mimeTypes.isNotEmpty()) {
-                            Text(
-                                "MIME: " + entry.options.mimeTypes.joinToString(),
-                                Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                        Text(
+                            if (entry.options.mimeTypes.isEmpty()) stringResource(R.string.dynamic_filter_no_mime)
+                            else "MIME: " + entry.options.mimeTypes.joinToString() +
+                                if (entry.options.includeNoMime) " + " + stringResource(R.string.dynamic_filter_no_mime) else "",
+                            Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
+                        )
                         Text(
                             stringResource(directionTextMap[entry.options.direction] ?: R.string.both_direction),
                             Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
@@ -190,6 +191,7 @@ fun AddDynamicIntentFilterScreen(
     val categories = remember { mutableStateListOf<String>() }
     val mimeTypes = remember { mutableStateListOf<String>() }
     var direction by rememberSaveable { mutableIntStateOf(3) }
+    var includeNoMime by rememberSaveable { mutableStateOf(false) }
     var entryLoaded by rememberSaveable { mutableStateOf(params.editingId == -1) }
 
     LaunchedEffect(params.editingId, filtersLoaded) {
@@ -202,10 +204,15 @@ fun AddDynamicIntentFilterScreen(
                 categories.addAll(options.categories)
                 mimeTypes.clear()
                 mimeTypes.addAll(options.mimeTypes)
+                includeNoMime = options.includeNoMime
                 direction = options.direction
             }
             entryLoaded = true
         }
+    }
+
+    LaunchedEffect(entryLoaded, mimeTypes.size) {
+        if (entryLoaded && mimeTypes.isEmpty()) includeNoMime = false
     }
 
     val cleanActions = actions.map(String::trim).filter(String::isNotEmpty).distinct()
@@ -234,7 +241,6 @@ fun AddDynamicIntentFilterScreen(
                 color = MaterialTheme.colorScheme.error
             )
         }
-
         Button(
             {
                 val options = DynamicIntentFilterOptions(cleanActions, cleanCategories, cleanMimeTypes, direction)
@@ -260,14 +266,16 @@ fun AddDynamicIntentFilterScreen(
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 @Composable
 private fun DynamicStringListEditor(
     titleId: Int,
     values: SnapshotStateList<String>,
-    fieldLabel: String
+    fieldLabel: String,
+    suggestions: List<DynamicIntentSuggestion>
 ) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding, vertical = 6.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(titleId), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.weight(1F))
             TextButton({ values.add("") }) {
@@ -285,7 +293,27 @@ private fun DynamicStringListEditor(
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
                     )
-                )
+                    ExposedDropdownMenu(
+                        expanded && matchingSuggestions.isNotEmpty(),
+                        { expanded = false },
+                        modifier = Modifier.heightIn(max = 360.dp)
+                    ) {
+                        matchingSuggestions.forEach { suggestion ->
+                            DropdownMenuItem(
+                                {
+                                    Column {
+                                        Text(suggestion.name, style = MaterialTheme.typography.titleSmall)
+                                        Text(suggestion.value, style = MaterialTheme.typography.bodySmall)
+                                    }
+                                },
+                                {
+                                    values[index] = suggestion.value
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
                 IconButton({ values.removeAt(index) }) {
                     Icon(Icons.Outlined.Delete, stringResource(R.string.remove))
                 }
