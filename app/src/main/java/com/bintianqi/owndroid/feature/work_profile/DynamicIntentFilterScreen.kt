@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -223,31 +222,9 @@ fun AddDynamicIntentFilterScreen(
     val canSave = cleanActions.isNotEmpty() && !invalidMime && entryLoaded
 
     MyScaffold(if (params.editingId == -1) R.string.add_filter else R.string.edit, navigateUp) {
-        DynamicStringListEditor(R.string.actions, actions, "Action", DynamicIntentSuggestionCatalog.actions)
-        DynamicStringListEditor(R.string.categories, categories, "Category", DynamicIntentSuggestionCatalog.categories)
-        DynamicStringListEditor(R.string.mime_types, mimeTypes, "MIME type", DynamicIntentSuggestionCatalog.mimeTypes)
-        if (cleanMimeTypes.isEmpty()) {
-            Text(
-                stringResource(R.string.dynamic_filter_no_mime_description),
-                Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall
-            )
-        } else {
-            Row(
-                Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(includeNoMime, { includeNoMime = it })
-                Column(Modifier.weight(1F)) {
-                    Text(stringResource(R.string.dynamic_filter_include_no_mime))
-                    Text(
-                        stringResource(R.string.dynamic_filter_include_no_mime_description),
-                        Modifier.alpha(0.7F), style = MaterialTheme.typography.bodySmall
-                    )
-                }
-            }
-        }
+        DynamicStringListEditor(R.string.actions, actions, "Action")
+        DynamicStringListEditor(R.string.categories, categories, "Category")
+        DynamicStringListEditor(R.string.mime_types, mimeTypes, "MIME type")
         DynamicDirectionSelector(direction, { direction = it })
 
         if (cleanActions.isEmpty()) {
@@ -266,10 +243,7 @@ fun AddDynamicIntentFilterScreen(
         }
         Button(
             {
-                val options = DynamicIntentFilterOptions(
-                    cleanActions, cleanCategories, cleanMimeTypes, direction,
-                    includeNoMime && cleanMimeTypes.isNotEmpty()
-                )
+                val options = DynamicIntentFilterOptions(cleanActions, cleanCategories, cleanMimeTypes, direction)
                 if (params.editingId == -1) vm.addFilter(options)
                 else vm.updateFilter(params.editingId, options)
                 navigateUp()
@@ -310,36 +284,14 @@ private fun DynamicStringListEditor(
             }
         }
         values.forEachIndexed { index, value ->
-            var expanded by remember(index) { mutableStateOf(false) }
-            val matchingSuggestions = remember(value, suggestions) {
-                if (value.isBlank()) suggestions
-                else suggestions.filter {
-                    it.name.contains(value, ignoreCase = true) ||
-                        it.value.contains(value, ignoreCase = true)
-                }
-            }
-            Row(
-                Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ExposedDropdownMenuBox(
-                    expanded,
-                    { expanded = it },
-                    Modifier.weight(1F)
-                ) {
-                    OutlinedTextField(
-                        value,
-                        {
-                            values[index] = it
-                            expanded = true
-                        },
-                        Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth(),
-                        label = { Text(fieldLabel) },
-                        singleLine = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
-                        )
+            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value, { values[index] = it },
+                    Modifier.weight(1F),
+                    label = { Text(fieldLabel) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
                     )
                     ExposedDropdownMenu(
                         expanded && matchingSuggestions.isNotEmpty(),

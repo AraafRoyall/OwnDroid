@@ -9,7 +9,7 @@ import com.bintianqi.owndroid.feature.applications.AppGroupRepository
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 18) {
+class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 17) {
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(DHIZUKU_CLIENTS_TABLE)
         db.execSQL(SECURITY_LOGS_TABLE)
@@ -88,22 +88,6 @@ class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 18) 
                 db.execSQL("DROP TABLE cpif2")
             }
         }
-        if (oldVersion < 18) {
-            val hasIncludeNoMime = db.rawQuery("PRAGMA table_info(dynamic_cpif)", null).use { cursor ->
-                val nameIndex = cursor.getColumnIndexOrThrow("name")
-                var found = false
-                while (cursor.moveToNext()) {
-                    if (cursor.getString(nameIndex) == "include_no_mime") {
-                        found = true
-                        break
-                    }
-                }
-                found
-            }
-            if (!hasIncludeNoMime) {
-                db.execSQL("ALTER TABLE dynamic_cpif ADD COLUMN include_no_mime INTEGER NOT NULL DEFAULT 0")
-            }
-        }
     }
 
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -131,7 +115,7 @@ class MyDbHelper(context: Context): SQLiteOpenHelper(context, "data", null, 18) 
         const val CPIF2_TABLE_OLD = "CREATE TABLE cpif2 (id INTEGER PRIMARY KEY, action_str TEXT, category TEXT, mime_type TEXT, direction INTEGER, created_at INTEGER)"
         const val CPIF2_ADD_STATUS = "ALTER TABLE cpif2 ADD COLUMN enabled INTEGER DEFAULT TRUE"
         const val CPIF2_TABLE = "CREATE TABLE cpif2 (id INTEGER PRIMARY KEY, action_str TEXT, category TEXT, mime_type TEXT, direction INTEGER, created_at INTEGER, enabled INTEGER DEFAULT TRUE)"
-        const val DYNAMIC_CPIF_TABLE = "CREATE TABLE IF NOT EXISTS dynamic_cpif (id INTEGER PRIMARY KEY, actions TEXT NOT NULL, categories TEXT NOT NULL, mime_types TEXT NOT NULL, direction INTEGER NOT NULL, include_no_mime INTEGER NOT NULL DEFAULT 0, created_at INTEGER NOT NULL, enabled INTEGER DEFAULT TRUE)"
+        const val DYNAMIC_CPIF_TABLE = "CREATE TABLE IF NOT EXISTS dynamic_cpif (id INTEGER PRIMARY KEY, actions TEXT NOT NULL, categories TEXT NOT NULL, mime_types TEXT NOT NULL, direction INTEGER NOT NULL, created_at INTEGER NOT NULL, enabled INTEGER DEFAULT TRUE)"
         const val APP_MIGRATIONS_TABLE = "CREATE TABLE IF NOT EXISTS app_migrations (name TEXT PRIMARY KEY, created_at INTEGER NOT NULL)"
         const val TIME_BLOCK_RULES_TABLE = "CREATE TABLE time_block_rules (id INTEGER PRIMARY KEY, package_name TEXT, daily_limit_minutes INTEGER, blocked_windows TEXT, allowed_windows TEXT, enabled INTEGER)"
         const val TIME_BLOCK_SUSPENDED_TABLE = "CREATE TABLE time_block_suspended (package_name TEXT PRIMARY KEY)"
