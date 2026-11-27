@@ -212,6 +212,10 @@ fun AddDynamicIntentFilterScreen(
         }
     }
 
+    LaunchedEffect(entryLoaded, mimeTypes.size) {
+        if (entryLoaded && mimeTypes.isEmpty()) includeNoMime = false
+    }
+
     val cleanActions = actions.map(String::trim).filter(String::isNotEmpty).distinct()
     val cleanCategories = categories.map(String::trim).filter(String::isNotEmpty).distinct()
     val cleanMimeTypes = mimeTypes.map(String::trim).filter(String::isNotEmpty).distinct()
