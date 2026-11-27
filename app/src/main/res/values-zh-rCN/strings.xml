@@ -806,4 +806,6 @@
     <string name="dynamic_filter_no_mime">无 MIME 类型</string>
     <string name="dynamic_filter_no_mime_description">匹配不带 MIME 类型或数据 URI 的 Intent。</string>
     <string name="dynamic_filter_mime_required">请至少添加一种 MIME 类型，或选择“无 MIME 类型”。</string>
+    <string name="dynamic_filter_include_no_mime">同时匹配不带 MIME 类型的 Intent</string>
+    <string name="dynamic_filter_include_no_mime_description">为不带 MIME 类型或数据 URI 的 Intent 添加第二个过滤器。</string>
 </resources>
