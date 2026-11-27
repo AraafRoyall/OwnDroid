@@ -34,13 +34,13 @@ object DynamicIntentFilterApplier {
         options: DynamicIntentFilterOptions,
         includeMimeTypes: Boolean
     ): IntentFilter {
-        return IntentFilter().apply {
-            options.actions.forEach(::addAction)
-            options.categories.forEach(::addCategory)
-            if (includeMimeTypes) {
-                options.mimeTypes.forEach { addMimeType(this, it) }
-            }
+        val filter = IntentFilter()
+        options.actions.forEach(filter::addAction)
+        options.categories.forEach(filter::addCategory)
+        if (includeMimeTypes) {
+            options.mimeTypes.forEach { addMimeType(filter, it) }
         }
+        return filter
     }
 
     private fun addMimeType(filter: IntentFilter, mimeType: String) {
