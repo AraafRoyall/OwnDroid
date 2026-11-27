@@ -615,4 +615,6 @@
     <string name="dynamic_filter_no_mime">Без MIME-типа</string>
     <string name="dynamic_filter_no_mime_description">Соответствует интентам без MIME-типа и URI данных.</string>
     <string name="dynamic_filter_mime_required">Добавьте хотя бы один MIME-тип или выберите «Без MIME-типа».</string>
+    <string name="dynamic_filter_include_no_mime">Также учитывать интенты без MIME-типа</string>
+    <string name="dynamic_filter_include_no_mime_description">Добавляет отдельный фильтр для интентов без MIME-типа и URI данных.</string>
 </resources>
