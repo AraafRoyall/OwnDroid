@@ -15,7 +15,6 @@ class DynamicIntentFilterRepository(private val dbHelper: MyDbHelper) {
             put("mime_types", Json.encodeToString(options.mimeTypes))
             put("direction", options.direction)
             put("include_no_mime", if (options.includeNoMime) 1 else 0)
-            put("include_no_mime", if (options.includeNoMime) 1 else 0)
             put("created_at", System.currentTimeMillis())
             put("enabled", if (enabled) 1 else 0)
         }
@@ -29,6 +28,7 @@ class DynamicIntentFilterRepository(private val dbHelper: MyDbHelper) {
             put("categories", Json.encodeToString(options.categories))
             put("mime_types", Json.encodeToString(options.mimeTypes))
             put("direction", options.direction)
+            put("include_no_mime", if (options.includeNoMime) 1 else 0)
             put("created_at", System.currentTimeMillis())
         }
         dbHelper.writableDatabase.update("dynamic_cpif", values, "id = ?", arrayOf(id.toString()))
