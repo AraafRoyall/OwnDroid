@@ -1,68 +1,60 @@
 package com.bintianqi.owndroid.feature.work_profile
 
 import android.content.Intent
-import java.lang.reflect.Modifier
+import android.provider.AlarmClock
+import android.provider.MediaStore
+import android.speech.RecognizerIntent
 
 internal data class DynamicIntentSuggestion(
     val name: String,
     val value: String
 )
 
+/**
+ * Curated app-facing suggestions based on AOSP DefaultCrossProfileIntentFiltersUtils.
+ * Do not reflect every Intent constant here: broadcast-only and unrelated system actions
+ * are intentionally excluded. Custom values can still be entered in the editor.
+ */
 internal object DynamicIntentSuggestionCatalog {
-    val actions: List<DynamicIntentSuggestion> by lazy { loadIntentConstants("ACTION_") }
-    val categories: List<DynamicIntentSuggestion> by lazy { loadIntentConstants("CATEGORY_") }
+    val actions = listOf(
+        DynamicIntentSuggestion("ACTION_VIEW", Intent.ACTION_VIEW),
+        DynamicIntentSuggestion("ACTION_SEND", Intent.ACTION_SEND),
+        DynamicIntentSuggestion("ACTION_SEND_MULTIPLE", Intent.ACTION_SEND_MULTIPLE),
+        DynamicIntentSuggestion("ACTION_SENDTO", Intent.ACTION_SENDTO),
+        DynamicIntentSuggestion("ACTION_GET_CONTENT", Intent.ACTION_GET_CONTENT),
+        DynamicIntentSuggestion("ACTION_OPEN_DOCUMENT", Intent.ACTION_OPEN_DOCUMENT),
+        DynamicIntentSuggestion("ACTION_PICK", Intent.ACTION_PICK),
+        DynamicIntentSuggestion("ACTION_PICK_IMAGES", MediaStore.ACTION_PICK_IMAGES),
+        DynamicIntentSuggestion("ACTION_EDIT", Intent.ACTION_EDIT),
+        DynamicIntentSuggestion("ACTION_INSERT", Intent.ACTION_INSERT),
+        DynamicIntentSuggestion("ACTION_INSERT_OR_EDIT", Intent.ACTION_INSERT_OR_EDIT),
+        DynamicIntentSuggestion("ACTION_DIAL", Intent.ACTION_DIAL),
+        DynamicIntentSuggestion("ACTION_CALL_BUTTON", Intent.ACTION_CALL_BUTTON),
+        DynamicIntentSuggestion("ACTION_MAIN", Intent.ACTION_MAIN),
+        DynamicIntentSuggestion("ACTION_IMAGE_CAPTURE", MediaStore.ACTION_IMAGE_CAPTURE),
+        DynamicIntentSuggestion("ACTION_VIDEO_CAPTURE", MediaStore.ACTION_VIDEO_CAPTURE),
+        DynamicIntentSuggestion("RECORD_SOUND_ACTION", MediaStore.Audio.Media.RECORD_SOUND_ACTION),
+        DynamicIntentSuggestion("ACTION_SET_ALARM", AlarmClock.ACTION_SET_ALARM),
+        DynamicIntentSuggestion("ACTION_SHOW_ALARMS", AlarmClock.ACTION_SHOW_ALARMS),
+        DynamicIntentSuggestion("ACTION_SET_TIMER", AlarmClock.ACTION_SET_TIMER),
+        DynamicIntentSuggestion("ACTION_RECOGNIZE_SPEECH", RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+    )
+
+    val categories = listOf(
+        DynamicIntentSuggestion("CATEGORY_DEFAULT", Intent.CATEGORY_DEFAULT),
+        DynamicIntentSuggestion("CATEGORY_BROWSABLE", Intent.CATEGORY_BROWSABLE),
+        DynamicIntentSuggestion("CATEGORY_OPENABLE", Intent.CATEGORY_OPENABLE),
+        DynamicIntentSuggestion("CATEGORY_HOME", Intent.CATEGORY_HOME)
+    )
 
     val mimeTypes = listOf(
-        "Any file" to "*/*",
-        "Images" to "image/*",
-        "Video" to "video/*",
-        "Audio" to "audio/*",
-        "Text" to "text/*",
-        "Applications" to "application/*",
-        "Documents" to "application/pdf",
-        "JSON" to "application/json",
-        "XML" to "application/xml",
-        "ZIP archive" to "application/zip",
-        "APK package" to "application/vnd.android.package-archive",
-        "Binary file" to "application/octet-stream",
-        "Plain text" to "text/plain",
-        "HTML" to "text/html",
-        "CSV" to "text/csv",
-        "JPEG image" to "image/jpeg",
-        "PNG image" to "image/png",
-        "GIF image" to "image/gif",
-        "WebP image" to "image/webp",
-        "HEIF image" to "image/heif",
-        "HEIC image" to "image/heic",
-        "MP4 video" to "video/mp4",
-        "3GPP video" to "video/3gpp",
-        "MPEG audio" to "audio/mpeg",
-        "OGG audio" to "audio/ogg",
-        "WAV audio" to "audio/wav",
-        "MP4 audio" to "audio/mp4",
-        "Email message" to "message/rfc822",
-        "vCard contact" to "text/vcard",
-        "Calendar" to "text/calendar",
-        "EPUB ebook" to "application/epub+zip",
-        "GZIP archive" to "application/gzip",
-        "TAR archive" to "application/x-tar"
-    ).map { DynamicIntentSuggestion(it.first, it.second) }
-
-    private fun loadIntentConstants(prefix: String): List<DynamicIntentSuggestion> {
-        return Intent::class.java.fields.asSequence()
-            .filter {
-                it.name.startsWith(prefix) &&
-                    it.type == String::class.java &&
-                    Modifier.isStatic(it.modifiers) && Modifier.isFinal(it.modifiers)
-            }
-            .mapNotNull { field ->
-                runCatching {
-                    (field.get(null) as? String)?.let {
-                        DynamicIntentSuggestion(field.name, it)
-                    }
-                }.getOrNull()
-            }
-            .sortedBy { it.name }
-            .toList()
-    }
+        DynamicIntentSuggestion("Any data type", "*/*"),
+        DynamicIntentSuggestion("Images", "image/*"),
+        DynamicIntentSuggestion("Videos", "video/*"),
+        DynamicIntentSuggestion("Phone contact", "vnd.android.cursor.item/phone"),
+        DynamicIntentSuggestion("Phone contact (v2)", "vnd.android.cursor.item/phone_v2"),
+        DynamicIntentSuggestion("Person", "vnd.android.cursor.item/person"),
+        DynamicIntentSuggestion("Call list", "vnd.android.cursor.dir/calls"),
+        DynamicIntentSuggestion("Call entry", "vnd.android.cursor.item/calls")
+    )
 }
