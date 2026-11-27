@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -141,12 +142,11 @@ fun DynamicIntentFilterScreen(
                                 Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        if (entry.options.mimeTypes.isNotEmpty()) {
-                            Text(
-                                "MIME: " + entry.options.mimeTypes.joinToString(),
-                                Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
+                        Text(
+                            if (entry.options.mimeTypes.isEmpty()) stringResource(R.string.dynamic_filter_no_mime)
+                            else "MIME: " + entry.options.mimeTypes.joinToString(),
+                            Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
+                        )
                         Text(
                             stringResource(directionTextMap[entry.options.direction] ?: R.string.both_direction),
                             Modifier.alpha(0.7F), style = MaterialTheme.typography.bodyMedium
@@ -191,6 +191,7 @@ fun AddDynamicIntentFilterScreen(
     val categories = remember { mutableStateListOf<String>() }
     val mimeTypes = remember { mutableStateListOf<String>() }
     var direction by rememberSaveable { mutableIntStateOf(3) }
+    var mimeEnabled by rememberSaveable { mutableStateOf(false) }
     var entryLoaded by rememberSaveable { mutableStateOf(params.editingId == -1) }
 
     LaunchedEffect(params.editingId, filtersLoaded) {
@@ -203,6 +204,7 @@ fun AddDynamicIntentFilterScreen(
                 categories.addAll(options.categories)
                 mimeTypes.clear()
                 mimeTypes.addAll(options.mimeTypes)
+                mimeEnabled = options.mimeTypes.isNotEmpty()
                 direction = options.direction
             }
             entryLoaded = true
@@ -213,12 +215,23 @@ fun AddDynamicIntentFilterScreen(
     val cleanCategories = categories.map(String::trim).filter(String::isNotEmpty).distinct()
     val cleanMimeTypes = mimeTypes.map(String::trim).filter(String::isNotEmpty).distinct()
     val invalidMime = cleanMimeTypes.any { !isValidIntentMimeType(it) }
-    val canSave = cleanActions.isNotEmpty() && !invalidMime && entryLoaded
+    val missingMime = mimeEnabled && cleanMimeTypes.isEmpty()
+    val canSave = cleanActions.isNotEmpty() && !invalidMime && !missingMime && entryLoaded
 
     MyScaffold(if (params.editingId == -1) R.string.add_filter else R.string.edit, navigateUp) {
         DynamicStringListEditor(R.string.actions, actions, "Action", DynamicIntentSuggestionCatalog.actions)
         DynamicStringListEditor(R.string.categories, categories, "Category", DynamicIntentSuggestionCatalog.categories)
-        DynamicStringListEditor(R.string.mime_types, mimeTypes, "MIME type", DynamicIntentSuggestionCatalog.mimeTypes)
+        DynamicStringListEditor(
+            R.string.mime_types, mimeTypes, "MIME type", DynamicIntentSuggestionCatalog.mimeTypes,
+            emptyOptionLabel = R.string.dynamic_filter_no_mime,
+            emptyOptionDescription = R.string.dynamic_filter_no_mime_description,
+            emptyOptionSelected = !mimeEnabled,
+            onEmptyOptionChange = { noMime ->
+                mimeEnabled = !noMime
+                if (noMime) mimeTypes.clear()
+                else if (mimeTypes.isEmpty()) mimeTypes.add("")
+            }
+        )
         DynamicDirectionSelector(direction, { direction = it })
 
         if (cleanActions.isEmpty()) {
@@ -231,6 +244,13 @@ fun AddDynamicIntentFilterScreen(
         if (invalidMime) {
             Text(
                 stringResource(R.string.dynamic_filter_mime_invalid),
+                Modifier.padding(horizontal = HorizontalPadding),
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+        if (missingMime) {
+            Text(
+                stringResource(R.string.dynamic_filter_mime_required),
                 Modifier.padding(horizontal = HorizontalPadding),
                 color = MaterialTheme.colorScheme.error
             )
@@ -267,69 +287,97 @@ private fun DynamicStringListEditor(
     titleId: Int,
     values: SnapshotStateList<String>,
     fieldLabel: String,
-    suggestions: List<DynamicIntentSuggestion>
+    suggestions: List<DynamicIntentSuggestion>,
+    emptyOptionLabel: Int? = null,
+    emptyOptionDescription: Int? = null,
+    emptyOptionSelected: Boolean = false,
+    onEmptyOptionChange: ((Boolean) -> Unit)? = null
 ) {
-    Column(Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding, vertical = 6.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(stringResource(titleId), style = MaterialTheme.typography.titleMedium)
             Spacer(Modifier.weight(1F))
-            TextButton({ values.add("") }) {
-                Icon(Icons.Default.Add, null)
-                Text(stringResource(R.string.add))
+            if (!emptyOptionSelected) {
+                TextButton({ values.add("") }) {
+                    Icon(Icons.Default.Add, null)
+                    Text(stringResource(R.string.add))
+                }
             }
         }
-        values.forEachIndexed { index, value ->
-            var expanded by remember(index) { mutableStateOf(false) }
-            val matchingSuggestions = remember(value, suggestions) {
-                if (value.isBlank()) suggestions
-                else suggestions.filter {
-                    it.name.contains(value, ignoreCase = true) ||
-                        it.value.contains(value, ignoreCase = true)
-                }
-            }
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                ExposedDropdownMenuBox(
-                    expanded,
-                    { expanded = it },
-                    Modifier.weight(1F)
-                ) {
-                    OutlinedTextField(
-                        value,
-                        {
-                            values[index] = it
-                            expanded = true
-                        },
-                        Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth(),
-                        label = { Text(fieldLabel) },
-                        singleLine = true,
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
+        if (emptyOptionLabel != null) {
+            Row(
+                Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(emptyOptionSelected, { onEmptyOptionChange?.invoke(it) })
+                Column(Modifier.weight(1F)) {
+                    Text(stringResource(emptyOptionLabel), style = MaterialTheme.typography.bodyMedium)
+                    if (emptyOptionDescription != null) {
+                        Text(
+                            stringResource(emptyOptionDescription),
+                            Modifier.alpha(0.7F), style = MaterialTheme.typography.bodySmall
                         )
-                    )
-                    ExposedDropdownMenu(
-                        expanded && matchingSuggestions.isNotEmpty(),
-                        { expanded = false },
-                        modifier = Modifier.heightIn(max = 360.dp)
-                    ) {
-                        matchingSuggestions.forEach { suggestion ->
-                            DropdownMenuItem(
-                                {
-                                    Column {
-                                        Text(suggestion.name, style = MaterialTheme.typography.titleSmall)
-                                        Text(suggestion.value, style = MaterialTheme.typography.bodySmall)
-                                    }
-                                },
-                                {
-                                    values[index] = suggestion.value
-                                    expanded = false
-                                }
-                            )
-                        }
                     }
                 }
-                IconButton({ values.removeAt(index) }) {
-                    Icon(Icons.Outlined.Delete, stringResource(R.string.remove))
+            }
+        }
+        if (!emptyOptionSelected) {
+            values.forEachIndexed { index, value ->
+                var expanded by remember(index) { mutableStateOf(false) }
+                val matchingSuggestions = remember(value, suggestions) {
+                    if (value.isBlank()) suggestions
+                    else suggestions.filter {
+                        it.name.contains(value, ignoreCase = true) ||
+                            it.value.contains(value, ignoreCase = true)
+                    }
+                }
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = HorizontalPadding),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    ExposedDropdownMenuBox(
+                        expanded,
+                        { expanded = it },
+                        Modifier.weight(1F)
+                    ) {
+                        OutlinedTextField(
+                            value,
+                            {
+                                values[index] = it
+                                expanded = true
+                            },
+                            Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable).fillMaxWidth(),
+                            label = { Text(fieldLabel) },
+                            singleLine = true,
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next
+                            )
+                        )
+                        ExposedDropdownMenu(
+                            expanded && matchingSuggestions.isNotEmpty(),
+                            { expanded = false },
+                            modifier = Modifier.heightIn(max = 360.dp)
+                        ) {
+                            matchingSuggestions.forEach { suggestion ->
+                                DropdownMenuItem(
+                                    {
+                                        Column {
+                                            Text(suggestion.name, style = MaterialTheme.typography.titleSmall)
+                                            Text(suggestion.value, style = MaterialTheme.typography.bodySmall)
+                                        }
+                                    },
+                                    {
+                                        values[index] = suggestion.value
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    IconButton({ values.removeAt(index) }) {
+                        Icon(Icons.Outlined.Delete, stringResource(R.string.remove))
+                    }
                 }
             }
         }
