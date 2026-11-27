@@ -15,15 +15,31 @@ object DynamicIntentFilterApplier {
             val options = entry.options.normalized()
             require(options.actions.isNotEmpty()) { "A filter must contain at least one action" }
             require(options.direction in 1..3) { "Invalid intent filter direction" }
-            val filter = IntentFilter()
-            options.actions.forEach(filter::addAction)
-            options.categories.forEach(filter::addCategory)
-            options.mimeTypes.forEach { addMimeType(filter, it) }
-            pending += filter to options.direction
+            if (options.mimeTypes.isEmpty()) {
+                pending += createFilter(options, includeMimeTypes = false) to options.direction
+            } else {
+                pending += createFilter(options, includeMimeTypes = true) to options.direction
+                if (options.includeNoMime) {
+                    pending += createFilter(options, includeMimeTypes = false) to options.direction
+                }
+            }
         }
         dpm.clearCrossProfileIntentFilters(admin)
         pending.forEach { (filter, direction) ->
             dpm.addCrossProfileIntentFilter(admin, filter, direction)
+        }
+    }
+
+    private fun createFilter(
+        options: DynamicIntentFilterOptions,
+        includeMimeTypes: Boolean
+    ): IntentFilter {
+        return IntentFilter().apply {
+            options.actions.forEach(::addAction)
+            options.categories.forEach(::addCategory)
+            if (includeMimeTypes) {
+                options.mimeTypes.forEach { addMimeType(this, it) }
+            }
         }
     }
 
