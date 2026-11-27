@@ -29,7 +29,6 @@ internal object DynamicIntentSuggestionCatalog {
         DynamicIntentSuggestion("ACTION_INSERT", Intent.ACTION_INSERT),
         DynamicIntentSuggestion("ACTION_INSERT_OR_EDIT", Intent.ACTION_INSERT_OR_EDIT),
         DynamicIntentSuggestion("ACTION_DIAL", Intent.ACTION_DIAL),
-        DynamicIntentSuggestion("ACTION_CALL", Intent.ACTION_CALL),
         DynamicIntentSuggestion("ACTION_CALL_BUTTON", Intent.ACTION_CALL_BUTTON),
         DynamicIntentSuggestion("ACTION_MAIN", Intent.ACTION_MAIN),
         DynamicIntentSuggestion("ACTION_IMAGE_CAPTURE", MediaStore.ACTION_IMAGE_CAPTURE),
