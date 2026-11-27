@@ -612,4 +612,7 @@
     <string name="enter_confirm_to_deactivate">Введите "CONFIRM", чтобы продолжить.</string>
     <string name="delete_app_group">Удалить группу приложений</string>
     <string name="delete_app_group_confirmation">Вы уверены, что хотите удалить группу приложений %1$s? Это действие нельзя отменить.</string>
+    <string name="dynamic_filter_no_mime">Без MIME-типа</string>
+    <string name="dynamic_filter_no_mime_description">Соответствует интентам без MIME-типа и URI данных.</string>
+    <string name="dynamic_filter_mime_required">Добавьте хотя бы один MIME-тип или выберите «Без MIME-типа».</string>
 </resources>
