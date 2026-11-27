@@ -53,7 +53,7 @@ internal object DynamicIntentSuggestionCatalog {
             .filter {
                 it.name.startsWith(prefix) &&
                     it.type == String::class.java &&
-                    Modifier.isStatic(it.modifiers)
+                    Modifier.isStatic(it.modifiers) && Modifier.isFinal(it.modifiers)
             }
             .mapNotNull { field ->
                 runCatching {
@@ -62,7 +62,6 @@ internal object DynamicIntentSuggestionCatalog {
                     }
                 }.getOrNull()
             }
-            .distinctBy { it.value }
             .sortedBy { it.name }
             .toList()
     }
