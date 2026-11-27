@@ -32,7 +32,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.OutlinedTextField
@@ -42,7 +41,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -52,7 +50,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -300,15 +297,12 @@ fun MyScaffold(
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val sb = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
-        Modifier.nestedScroll(sb.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
-                { Text(stringResource(title)) },
+            TopAppBar(
+                { Text(stringResource(title), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
-                actions = actions,
-                scrollBehavior = sb
+                actions = actions
             )
         },
         contentWindowInsets = adaptiveInsets()
@@ -334,15 +328,12 @@ fun MyLazyScaffold(
     actions: @Composable RowScope.() -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
-    val sb = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
-        Modifier.nestedScroll(sb.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
-                { Text(stringResource(title)) },
+            TopAppBar(
+                { Text(stringResource(title), maxLines = 1, overflow = TextOverflow.Ellipsis) },
                 navigationIcon = { NavIcon(onNavIconClicked) },
-                actions = actions,
-                scrollBehavior = sb
+                actions = actions
             )
         },
         contentWindowInsets = adaptiveInsets()
