@@ -36,8 +36,6 @@ import com.bintianqi.owndroid.feature.system.SystemViewModel
 import com.bintianqi.owndroid.feature.system.TimeViewModel
 import com.bintianqi.owndroid.feature.user_restriction.UserRestrictionViewModel
 import com.bintianqi.owndroid.feature.users.UsersViewModel
-import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterRepository
-import com.bintianqi.owndroid.feature.work_profile.CrossProfileIntentFilterViewModel
 import com.bintianqi.owndroid.feature.work_profile.DynamicIntentFilterRepository
 import com.bintianqi.owndroid.feature.work_profile.DynamicIntentFilterViewModel
 import com.bintianqi.owndroid.feature.work_profile.WorkProfileViewModel
@@ -51,8 +49,7 @@ class MyViewModelFactory(
     val app: MyApplication, val ph: PrivilegeHelper,
     val sr: SettingsRepository, val nlRepo: NetworkLoggingRepository,
     val dsRepo: DhizukuServerRepository, val slRepo: SecurityLoggingRepository,
-    val agRepo: AppGroupRepository, val cpifRepo: CrossProfileIntentFilterRepository,
-    val dynamicCpifRepo: DynamicIntentFilterRepository, val tbRepo: TimeBlockerRepository, val um: UnlockManager,
+    val agRepo: AppGroupRepository, val dynamicCpifRepo: DynamicIntentFilterRepository, val tbRepo: TimeBlockerRepository, val um: UnlockManager,
     val agState: MutableStateFlow<List<AppGroup>>,
     val de: MutableStateFlow<DhizukuError?>, val ps: MutableStateFlow<PrivilegeStatus>,
     val ts: MutableStateFlow<MySettings.Theme>, val tc: ToastChannel
@@ -128,11 +125,8 @@ class MyViewModelFactory(
         if (checkType(WorkProfileViewModel::class)) {
             return WorkProfileViewModel(ph, ps, tc, sr) as T
         }
-        if (checkType(CrossProfileIntentFilterViewModel::class)) {
-            return CrossProfileIntentFilterViewModel(app, ph, cpifRepo, dynamicCpifRepo, tc, sr) as T
-        }
         if (checkType(DynamicIntentFilterViewModel::class)) {
-            return DynamicIntentFilterViewModel(ph, dynamicCpifRepo, cpifRepo, tc, sr) as T
+            return DynamicIntentFilterViewModel(app, ph, dynamicCpifRepo, tc, sr) as T
         }
 
         if (checkType(UserRestrictionViewModel::class)) {
