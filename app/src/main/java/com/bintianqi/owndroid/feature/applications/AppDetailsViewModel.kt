@@ -1,5 +1,6 @@
 package com.bintianqi.owndroid.feature.applications
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -31,13 +32,16 @@ class AppDetailsViewModel(
 ) : ViewModel() {
     val appInfo = MutableStateFlow<AppInfo?>(null)
     val detailedAppInfo = MutableStateFlow(DetailedAppInfo())
+    val hasInternetPermission = MutableStateFlow(false)
     val uiState = MutableStateFlow(AppDetailsUiState())
 
     fun getInfo() {
         viewModelScope.launch(Dispatchers.IO) {
             val pkgInfo = application.packageManager.getPackageInfo(
-                packageName, getInstalledAppsFlags
+                packageName, PackageManager.GET_PERMISSIONS or getInstalledAppsFlags
             )
+            hasInternetPermission.value =
+                Manifest.permission.INTERNET in (pkgInfo.requestedPermissions ?: emptyArray())
             appInfo.value = getAppInfo(application.packageManager, packageName)
             detailedAppInfo.value = DetailedAppInfo(pkgInfo.versionName ?: "", pkgInfo.versionCode)
             getStatus()

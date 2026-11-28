@@ -53,6 +53,7 @@ fun ApplicationDetailsScreen(
     val appInfo by vm.appInfo.collectAsState()
     val detailedAppInfo by vm.detailedAppInfo.collectAsState()
     val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val hasInternetPermission by vm.hasInternetPermission.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         vm.getInfo()
@@ -105,7 +106,7 @@ fun ApplicationDetailsScreen(
             R.string.disable_user_control, uiState.userControlDisabled,
             vm::setUserControlDisabled, R.drawable.do_not_touch_fill0
         )
-        if (VERSION.SDK_INT >= 28) SwitchItem(
+        if (VERSION.SDK_INT >= 28 && hasInternetPermission) SwitchItem(
             R.string.disable_metered_data, uiState.meteredDataDisabled,
             vm::setMeteredDataDisabled, R.drawable.money_off_fill0
         )
