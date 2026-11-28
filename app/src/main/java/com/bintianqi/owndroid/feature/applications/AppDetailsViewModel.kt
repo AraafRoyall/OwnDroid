@@ -33,6 +33,7 @@ class AppDetailsViewModel(
     val appInfo = MutableStateFlow<AppInfo?>(null)
     val detailedAppInfo = MutableStateFlow(DetailedAppInfo())
     val hasInternetPermission = MutableStateFlow(false)
+    val hasManagedConfiguration = MutableStateFlow(false)
     val uiState = MutableStateFlow(AppDetailsUiState())
 
     fun getInfo() {
@@ -42,6 +43,7 @@ class AppDetailsViewModel(
             )
             hasInternetPermission.value =
                 Manifest.permission.INTERNET in (pkgInfo.requestedPermissions ?: emptyArray())
+            hasManagedConfiguration.value = hasManifestRestrictions(application, packageName)
             appInfo.value = getAppInfo(application.packageManager, packageName)
             detailedAppInfo.value = DetailedAppInfo(pkgInfo.versionName ?: "", pkgInfo.versionCode)
             getStatus()
