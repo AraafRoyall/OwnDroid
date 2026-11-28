@@ -452,7 +452,7 @@ enum class AppSortingMode(val strRes: Int, val icon: Int?) {
 
 @Serializable
 data class AppSortingOptions(
-    val mode: AppSortingMode = AppSortingMode.None,
+    val mode: AppSortingMode = AppSortingMode.Name,
     val reversed: Boolean = false
 )
 
