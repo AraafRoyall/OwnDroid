@@ -53,6 +53,8 @@ fun ApplicationDetailsScreen(
     val appInfo by vm.appInfo.collectAsState()
     val detailedAppInfo by vm.detailedAppInfo.collectAsState()
     val uiState by vm.uiState.collectAsStateWithLifecycle()
+    val hasInternetPermission by vm.hasInternetPermission.collectAsStateWithLifecycle()
+    val hasManagedConfiguration by vm.hasManagedConfiguration.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         vm.getInfo()
@@ -105,7 +107,7 @@ fun ApplicationDetailsScreen(
             R.string.disable_user_control, uiState.userControlDisabled,
             vm::setUserControlDisabled, R.drawable.do_not_touch_fill0
         )
-        if (VERSION.SDK_INT >= 28) SwitchItem(
+        if (VERSION.SDK_INT >= 28 && hasInternetPermission) SwitchItem(
             R.string.disable_metered_data, uiState.meteredDataDisabled,
             vm::setMeteredDataDisabled, R.drawable.money_off_fill0
         )
@@ -113,7 +115,9 @@ fun ApplicationDetailsScreen(
             R.string.keep_after_uninstall, uiState.keepUninstalled,
             vm::setKeepUninstalled, R.drawable.delete_fill0
         )
-        FunctionItem(R.string.managed_configuration, icon = R.drawable.description_fill0) {
+        if (hasManagedConfiguration) FunctionItem(
+            R.string.managed_configuration, icon = R.drawable.description_fill0
+        ) {
             onNavigate(Destination.ManagedConfiguration(vm.packageName))
         }
         Row(Modifier.fillMaxWidth().padding(8.dp)) {

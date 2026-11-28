@@ -231,39 +231,77 @@ fun uninstallPackage(
     application: MyApplication, privilegeHelper: PrivilegeHelper,
     packageName: String, onComplete: (String?) -> Unit
 ) {
-    val action = "com.bintianqi.owndroid.action.PACKAGE_UNINSTALLED"
-    val receiver = object : BroadcastReceiver() {
+    val action = "com.bintianqi.owndroid.action.PACKAGE_UNINSTALLED.${java.util.UUID.randomUUID()}"
+    val completed = java.util.concurrent.atomic.AtomicBoolean(false)
+    var receiverRegistered = false
+    lateinit var receiver: BroadcastReceiver
+
+    fun finish(error: String?) {
+        if (!completed.compareAndSet(false, true)) return
+        if (receiverRegistered) {
+            try {
+                application.unregisterReceiver(receiver)
+            } catch (_: Exception) {
+            }
+            receiverRegistered = false
+        }
+        onComplete(error)
+    }
+
+    receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            val statusExtra = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, 999)
-            if (statusExtra == PackageInstaller.STATUS_PENDING_USER_ACTION) {
-                @SuppressWarnings("UnsafeIntentLaunch")
-                val confirmIntent = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
-                confirmIntent?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(confirmIntent)
-            } else {
-                context.unregisterReceiver(this)
-                if (statusExtra == PackageInstaller.STATUS_SUCCESS) {
-                    onComplete(null)
-                } else {
-                    onComplete(parsePackageInstallerMessage(context, intent))
+            val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, 999)
+            if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
+                try {
+                    @SuppressWarnings("UnsafeIntentLaunch")
+                    val confirmIntent = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)
+                    if (confirmIntent == null) {
+                        finish("The system did not provide an uninstall confirmation screen.")
+                    } else {
+                        confirmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        context.startActivity(confirmIntent)
+                    }
+                } catch (e: Exception) {
+                    finish(e.localizedMessage ?: "Unable to open the uninstall confirmation screen.")
                 }
+            } else if (status == PackageInstaller.STATUS_SUCCESS) {
+                finish(null)
+            } else {
+                val message = try {
+                    parsePackageInstallerMessage(context, intent)
+                } catch (_: Exception) {
+                    ""
+                }
+                finish(message.ifBlank { "Uninstall failed (status $status)." })
             }
         }
     }
-    ContextCompat.registerReceiver(
-        application, receiver, IntentFilter(action), null,
-        null, ContextCompat.RECEIVER_NOT_EXPORTED
-    )
-    val intent = Intent(action).setPackage(application.packageName)
-    val pi = if(VERSION.SDK_INT >= 34) {
-        PendingIntent.getBroadcast(
-            application, 0, intent,
-            PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT or PendingIntent.FLAG_MUTABLE
-        ).intentSender
-    } else {
-        PendingIntent.getBroadcast(application, 0, intent, PendingIntent.FLAG_MUTABLE).intentSender
+
+    try {
+        ContextCompat.registerReceiver(
+            application, receiver, IntentFilter(action), null,
+            null, ContextCompat.RECEIVER_NOT_EXPORTED
+        )
+        receiverRegistered = true
+
+        val intent = Intent(action).setPackage(application.packageName)
+        val pendingIntent = if (VERSION.SDK_INT >= 34) {
+            PendingIntent.getBroadcast(
+                application, 0, intent,
+                PendingIntent.FLAG_ALLOW_UNSAFE_IMPLICIT_INTENT or
+                        PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+            )
+        } else {
+            PendingIntent.getBroadcast(
+                application, 0, intent,
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_CANCEL_CURRENT
+            )
+        }
+        application.getPackageInstaller(privilegeHelper.dhizuku)
+            .uninstall(packageName, pendingIntent.intentSender)
+    } catch (e: Exception) {
+        finish(e.localizedMessage ?: e.cause?.localizedMessage ?: e.javaClass.simpleName)
     }
-    application.getPackageInstaller(privilegeHelper.dhizuku).uninstall(packageName, pi)
 }
 
 fun viewModelFactory(build: () -> ViewModel) =
